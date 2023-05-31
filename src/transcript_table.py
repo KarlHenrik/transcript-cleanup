@@ -20,11 +20,18 @@ class TranscriptTable:
         IDs, contents, times = [self._IDs[0]], [self._contents[0]], [self._times[0]]
         
         current_speaker = self._IDs[0]
+        last_paragraph_len = len(self._contents[0])
         for i in range(1, len(self._contents)):
-            if self._IDs[i] == current_speaker:
-                contents[-1] = f"{contents[-1]}\n\n{self._contents[i]}"
+            if (self._IDs[i] == current_speaker) & (self._IDs[i] != ""):
+                if last_paragraph_len + len(self._contents[i]) > 300:
+                    contents[-1] = f"{contents[-1]}\n\n{self._contents[i]}"
+                    last_paragraph_len = len(self._contents[i])
+                else:
+                    contents[-1] = f"{contents[-1]} {self._contents[i]}"
+                    last_paragraph_len += len(self._contents[i])
             else:
                 current_speaker = self._IDs[i]
+                last_paragraph_len = len(self._contents[i])
                 contents.append(self._contents[i])
                 IDs.append(self._IDs[i])
                 times.append(self._times[i])

@@ -67,4 +67,9 @@ class Format(Enum):
         create_docx(new_filename, headers, rows, widths)
     
     def TimeText_reformat(self, new_filename, times, contents, IDs):
+        for i, id in enumerate(IDs):
+            if id == "I":
+                IDs[i] = "Interviewee"
+            elif id == "R":
+                IDs[i] = "Researcher"
         create_docx_text(new_filename, times, contents, IDs)
