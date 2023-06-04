@@ -3,10 +3,10 @@ from enum import Enum
 from src.create_docx import create_docx, create_docx_text
 
 class Format(Enum):
-    MAXQDA_Rows = 1 # Time | (idx) | ID | Content
-    Timed_Rows = 2 # (idx) | ID | [Time]Content
-    NoTime_Rows = 3 # (idx) | ID | Content
-    Timed_Text = 4
+    Timed_Rows = 1 # Time | (idx) | ID | Content
+    Timed_Text = 2
+    MAXQDA_Rows = 3 # (idx) | ID | [Time]Content
+    NoTime_Rows = 4 # (idx) | ID | Content
 
     def description(self):
         match self:

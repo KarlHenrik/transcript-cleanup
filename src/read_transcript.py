@@ -14,6 +14,41 @@ def read_transcript(filename):
     else:
         raise ValueError("Invalid file extenstion. Only accepts .vtt or .docx files")
 
+def decide_docx_format(filename):
+    document = Document(filename)
+
+    if len(document.tables) == 0:
+        fullText = []
+        for para in document.paragraphs:
+            fullText.append(para.text)
+        raw_text = '\n'.join(fullText)
+        if raw_text[0] == "[":
+            return read_MAXQDA_Text(filename, raw_text)
+        else:
+            return read_Timed_Text(filename, raw_text)
+
+    table = document.tables[0]
+    try:
+        cells = get_cells_grid(table)
+    except docx.oxml.exceptions.InvalidXmlError:
+        raise NotImplementedError(f"You need to open and save the file {filename} in Word first, sorry!")
+
+    headers = [cell.text for cell in cells[0]]
+    cells = cells[1:]
+    match headers:
+        case ["Time", "", "ID", "Content"]:
+            return read_Timed(filename, cells)
+        case ["", "ID", "Content"]:
+            if has_MAXQDA_timestamp(cells[0][-1].text): #MAXQDA time stamp in first cell
+                return read_MAXQDA(filename, cells)
+            elif has_MAXQDA_timestamp(cells[1][-1].text): #Mangled Timestamps due to MAXQDA export
+                first_time = document.paragraphs[0].text.strip()
+                return read_MAXQDA_export(filename, cells, first_time)
+            else:
+                return read_NoTime(filename, cells)
+        
+    raise ValueError("File has invalid formatting")
+
 def time_from_vtt(line_with_time):
     return line_with_time.strip().split(" --> ")[0][:-2] # hh:mm:ss:x
 
@@ -41,19 +76,14 @@ def read_vtt(filename):
     IDs = [i for i in repeat("", len(contents))]
     return contents, IDs, times
 
-
-def has_MAXQDA_timestamp(input_text):
-    pattern = re.compile(r".*:.*:.*\..*", re.IGNORECASE)
-    return bool(pattern.match(input_text))
-
 def read_Timed_Text(filename, s):
     print(f"Reading {filename} as Timed Text format...")
     times = []
     contents = []
     IDs = []
-
     bad_id = re.compile(r"\n\d\d", re.IGNORECASE)
     pattern = re.compile(r"\d\d:\d\d:\d\d\.\d[^:]+:", re.IGNORECASE)
+
     time_ID_locs = [(m.start(0), m.end(0)) for m in re.finditer(pattern, s)]
     ends = [m[0] for m in time_ID_locs[1:]] + [-1]
     for m, end in zip(time_ID_locs, ends):
@@ -63,43 +93,23 @@ def read_Timed_Text(filename, s):
             IDs.append("")
             contents.append(s[m[0]+10:m[1]-3].strip())
         else:
+            if maybeID == "Interviewee":
+                maybeID = "I"
+            elif maybeID == "Researcher":
+                maybeID = "R"
             IDs.append(maybeID)
             contents.append(s[m[1]:end].strip())
 
     return contents, IDs, times
 
-def decide_docx_format(filename):
-    document = Document(filename)
+def read_MAXQDA_Text(filename, s):
+    def replacement(match):
+        return f"0{match.group(0)[1:-2]}\n"
 
-    if len(document.tables) == 0:
-        fullText = []
-        for para in document.paragraphs:
-            fullText.append(para.text)
-        raw_text = '\n'.join(fullText)
-        return read_Timed_Text(filename, raw_text)
+    mq = re.compile(r"\[\d:\d\d:\d\d\.\d] ", re.IGNORECASE)
+    s = mq.sub(replacement, s)
 
-    
-    table = document.tables[0]
-    try:
-        cells = get_cells_grid(table)
-    except docx.oxml.exceptions.InvalidXmlError:
-        raise NotImplementedError(f"You need to open and save the file {filename} in Word first, sorry!")
-
-    headers = [cell.text for cell in cells[0]]
-    cells = cells[1:]
-    match headers:
-        case ["Time", "", "ID", "Content"]:
-            return read_Timed(filename, cells)
-        case ["", "ID", "Content"]:
-            if has_MAXQDA_timestamp(cells[0][-1].text):
-                return read_MAXQDA(filename, cells)
-            elif has_MAXQDA_timestamp(cells[1][-1].text):
-                first_time = document.paragraphs[0].text.strip()
-                return read_MAXQDA(filename, cells, first_time)
-            else:
-                return read_NoTime(filename, cells)
-        
-    raise ValueError("File has invalid formatting")
+    return read_Timed_Text(filename, s)
     
 def read_Timed(filename, cells):
     print(f"Reading {filename} as TimeColumn format...")
@@ -116,6 +126,10 @@ def read_NoTime(filename, cells):
     times = None
     return contents, IDs, times
 
+def has_MAXQDA_timestamp(input_text):
+    pattern = re.compile(r".*:.*:.*\..*", re.IGNORECASE)
+    return bool(pattern.match(input_text))
+
 def read_MAXQDA(filename, cells):
     print(f"Reading {filename} as MAXQDA format...")
     contents = []
@@ -130,7 +144,7 @@ def read_MAXQDA(filename, cells):
 
     return contents, IDs, times
 
-def read_MAXQDA_export(filename, cells, first_time = None):
+def read_MAXQDA_export(filename, cells, first_time):
     print(f"Reading {filename} as MAXQDA timestamp exported format...")
     contents = [cells[0][2].text]
     IDs = [row[1].text for row in cells]

@@ -1,2 +1,4 @@
 /transcripts
 *.pyc
+src/temp/gui_old.py
+transcript_dev.ipynb
