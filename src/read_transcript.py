@@ -64,13 +64,49 @@ def read_vtt(filename):
     contents = [text[1].strip()]
     times = [time_from_vtt(text[0])]
 
+    sentence_completed = contents[0][-1] in [".","?","!"]
     for i in range(3, len(text) - 1, 3):
+        started_new_sentence = False
         content = text[i+1].strip()
-        if len(contents[-1]) == 0 or contents[-1][-1] not in [".", "!", "?"]:
-            contents[-1] = contents[-1] + " " + content
-        else:
-            contents.append(content)
-            times.append(time_from_vtt(text[i]))
+        new_contents = [c for c in re.finditer('\.\.\.|\.|\?|\!', content)]
+
+        if len(new_contents) == 0: # No punctuation means incomplete sentence
+            if sentence_completed: # Starts new sentence without end
+                contents.append(content)
+                times.append(time_from_vtt(text[i]))
+            else:
+                contents[-1] = contents[-1] + " " + content.strip() # Just keeping sentence going
+            sentence_completed = False
+            continue
+
+        start = 0
+        first_new_sentence = 0
+        #If the first new content just there to complete the sentence?
+        if not sentence_completed:
+            contents[-1] = contents[-1] + " " + content[start:new_contents[0].end(0)].strip()
+            start = new_contents[0].end(0)
+            first_new_sentence = 1
+        sentence_completed = True
+
+        # Add all new complete sentences
+        for c in new_contents[first_new_sentence:]:
+            contents.append(content[start:c.end(0)].strip())
+            start = c.end(0)
+            if started_new_sentence:
+                times.append("")
+            else:
+                times.append(time_from_vtt(text[i]))
+            started_new_sentence = True
+        end = len(content)
+
+        #If there is more left at the end, it becomes new incomplete sentence
+        if len(content[start:end].strip()) > 0: 
+            contents.append(content[start:end].strip())
+            if started_new_sentence:
+                times.append("")
+            else:
+                times.append(time_from_vtt(text[i]))
+            sentence_completed = False
 
     times = [f"00:{time}" if len(time) == 7 else time for time in times]
     IDs = [i for i in repeat("", len(contents))]
