@@ -56,7 +56,7 @@ def read_vtt(filename):
     """
     Reading the vtt file and turning it into lists of strings
     """
-    with open(filename, "r") as ifile:
+    with open(filename, "r", encoding="utf-8") as ifile:
         ifile.readline() # WEBVTT
         ifile.readline() # BLANK
         text = ifile.readlines()
