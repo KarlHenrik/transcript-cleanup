@@ -1,5 +1,6 @@
 {
   "name": "process_transcript",
+  "homepage": "https://karlhenrik.github.io/transcript-cleanup/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
