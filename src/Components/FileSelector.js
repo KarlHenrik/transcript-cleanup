@@ -22,7 +22,7 @@ function FileSelector(props) {
         }
     )
     
-    }, [])
+    }, [props.setFileName, props.setContents])
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {'text/vtt': ['.vtt'],}})
 
     return <div {...getRootProps()} className="FileSelector">

@@ -14,7 +14,7 @@ function App() {
   
   useEffect(() => {
     globalState[0] = speakers
-  }, [globalState])
+  }, [globalState, speakers])
 
   return (
     <div className='App'>

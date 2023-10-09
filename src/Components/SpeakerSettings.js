@@ -10,7 +10,7 @@ function SpeakerSettings(props) {
     const speakers = props.speakers;
     
     function keyPress(e) {
-        if (e.key == "Enter") {
+        if (e.key === "Enter") {
             renameSpeaker()
         }
     }
@@ -30,7 +30,7 @@ function SpeakerSettings(props) {
         setEditing("");
     }
     function keyPressAdd(e) {
-        if (e.key == "Enter") {
+        if (e.key === "Enter") {
             addSpeaker()
         }
     }

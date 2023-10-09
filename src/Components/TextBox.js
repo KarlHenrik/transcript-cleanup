@@ -21,38 +21,33 @@ function TextBox(props) {
 
     useEffect(() => {
         if (props.speakers[1].length) {
-            if (ID == props.speakers[1]) {
+            if (ID === props.speakers[1]) {
                 setID("");
             } else if (ID > props.speakers[1]) {
                 setID(ID => ID - 1);
             }
         }
-    }, [props.speakers]);
+    }, [props.speakers, ID]);
 
     useEffect(() => {
         props.globalState[1][props.idx] = input
-    }, [props.globalState]);
-
-    useEffect(() => {
-        console.log(props.idx)
-    }, [props.idx]);
-    
+    }, [props.globalState, input, props.idx]);
     
     function setSpeaker(key) {
         props.speakers[0].forEach((c, idx) => {
-            if (key == idx+1) {
+            if (key === String(idx+1)) {
                 setID(idx);
                 focusNextSpeaker();
                 return
             }
         })
-        if (key == "w") {
+        if (key === "w") {
             focusPrevSpeaker();
         }
-        if (key == "s") {
+        if (key === "s") {
             focusNextSpeaker();
         }
-        if (key == "|" || key == "Backspace") {
+        if (key === "|" || key === "Backspace") {
             setID("");
         }
     }
