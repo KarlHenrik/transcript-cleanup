@@ -32,7 +32,7 @@ function read_vtt(raw_text) {
         if (!sentence_completed) {
             contents[contents.length - 1].text += " " + new_sentences.shift().trim()
         }
-        if (new_sentences.length != 0) {
+        if (new_sentences.length !== 0) {
             contents.push(
                 {
                     text: new_sentences.shift().trim(),
@@ -50,7 +50,7 @@ function read_vtt(raw_text) {
                 }
             )
         }
-        sentence_completed = contents[contents.length - 1].text.match( /\.|\?|\!/g); // If the last sentence contains punctuation, it is completed
+        sentence_completed = contents[contents.length - 1].text.match( /\.|\?|!/g); // If the last sentence contains punctuation, it is completed
     }
     return contents
 }
