@@ -1,39 +1,40 @@
 import './App.css';
 import DownloadButton from './DownloadButton.js';
 import FileSelector from './FileSelector';
+import SpeakerSettings from './SpeakerSettings';
 import TextDisplay from './TextDisplay.js';
-import React, { useState } from "react";
-
-
+import React, { useState, useEffect } from "react";
 
 function App() {
   const [fileName, setFileName] = useState(null);
-  const [contents, setContents] = useState([]);
+  const [contents, setContents] = useState(false);
+  const [speakers, setSpeakers] = useState([["Researcher", "Interviewee"], []])
+  const [globalState, setGlobalState] = useState([speakers, []])
+  
+  
+  useEffect(() => {
+    globalState[0] = speakers
+  }, [globalState])
 
   return (
     <div className='App'>
       <h1 className='Title'>
-        Transcript Processing
+        Transcript Cleanup
       </h1>
-
+      
       <div className='Controls'>
-        <FileSelector fileName={fileName} setFileName={setFileName} setContents={setContents}/>
-
-        <div>Speaker 1</div>
-        <div>Speaker 2</div>
-        <div>Add Speaker</div>
-        <div>Speaker Collapse</div>
         
+        <SpeakerSettings speakers={speakers} setSpeakers={setSpeakers} />
+        
+        <div>Speaker Collapse</div>
 
-        <DownloadButton contents={contents}/>
+        <DownloadButton contents={contents} globalState={globalState} setGlobalState={setGlobalState}/>
       </div>
 
       <div className='Display'>
-        <TextDisplay contents={contents} />
+        {!contents && <FileSelector fileName={fileName} setFileName={setFileName} setContents={setContents}/>}
+        {contents && <TextDisplay contents={contents} setContents={setContents} speakers={speakers} globalState={globalState} />}
       </div>
-      
-
-      
     </div>
   );
 };

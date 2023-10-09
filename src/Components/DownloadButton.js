@@ -3,6 +3,8 @@ import "./DownloadButton.css"
 
 function DownloadButton(props) {
     function handleDownload() {
+        props.setGlobalState([[], []])
+        
         //var link = document.createElement('a');
         //link.download = 'data.txt';
         //var blob = new Blob(["placeholder"], {type: 'text/plain'});
@@ -10,7 +12,7 @@ function DownloadButton(props) {
         //link.click();
     }
     if (props.contents) {
-        return <button onClick={handleDownload} className="DownloadButton">Download file</button>
+        return <button onClick={handleDownload} className="DownloadButton">Download</button>
     } else {
         return null
     }

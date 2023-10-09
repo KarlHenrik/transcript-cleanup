@@ -1,22 +1,43 @@
-import React from "react";
+import React, {useCallback} from "react";
+import {useDropzone} from 'react-dropzone'
 import "./FileSelector.css"
 
 function FileSelector(props) {
-    const handleFileChange = (e) => {
-        if (e.target.files) {
-            props.setFileName(e.target.files[0].name);
-            e.target.files[0]
-                .text()
-                .then((t) => {
-                    props.setContents(read_vtt(t));
-                });
-        }
-    };
+    const onDrop = useCallback((acceptedFiles) => {
+        acceptedFiles.forEach((file) => {
+            const reader = new FileReader()
 
-    return <div>
-        <label htmlFor="file" id="file_label">Choose .vtt file</label>
-        <input type="file" id="file" accept=".vtt" onChange={handleFileChange} />
+            reader.onabort = () => console.log('file reading was aborted')
+            reader.onerror = () => console.log('file reading has failed')
+            reader.onload = () => {
+                props.setFileName(file.name);
+                file
+                    .text()
+                    .then((t) => {
+                        props.setContents(read_vtt(t));
+                    });
+            }
+            reader.readAsArrayBuffer(file)
+            return
+        }
+    )
+    
+    }, [])
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {'text/vtt': ['.vtt'],}})
+
+    return <div {...getRootProps()} className="FileSelector">
+        <input {...getInputProps()} />
+        {
+        isDragActive ?
+            <p>Drop the files here ...</p> :
+            <p>Drag 'n' drop some files here, or click to select files</p>
+        }
     </div>
+
+    //return <div className="FileSelector">
+    //    <label htmlFor="file" id="file_label">Choose .vtt file</label>
+    //    <input type="file" id="file" accept=".vtt" onChange={handleFileChange} />
+    //</div>
 }
 
 function time_from_vtt(line_with_time) {

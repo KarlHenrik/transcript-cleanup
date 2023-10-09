@@ -1,3 +1,10 @@
 #file_label {
     padding-right: 1rem;
 }
+
+.FileSelector {
+    background-color: lightblue;
+    width: fit-content;
+    border: solid black 0.1em;
+    padding: 2em;
+}
