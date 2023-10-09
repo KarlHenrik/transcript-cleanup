@@ -2,7 +2,7 @@ import './App.css';
 import DownloadButton from './DownloadButton.js';
 import FileSelector from './FileSelector';
 import TextDisplay from './TextDisplay.js';
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 
 
