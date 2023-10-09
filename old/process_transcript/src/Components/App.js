@@ -1,55 +1,39 @@
 import './App.css';
-import React, { useState } from "react";
+import DownloadButton from './DownloadButton.js';
+import FileSelector from './FileSelector';
+import TextDisplay from './TextDisplay.js';
+import React, { useState, useEffect } from "react";
 
 
 
 function App() {
-  const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState(null);
+  const [contents, setContents] = useState([]);
 
-  const handleFileChange = (e) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleDownload = () => {
-    file.text()
-    .then((text) => {
-      console.log(text);
-    });
-    /*
-    const element = document.createElement("a");
-    //const file = new Blob([file], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = "myFile.txt";
-    document.body.appendChild(element); // Required for this to work in FireFox
-    element.click();
-    */
-  }
-  
   return (
-    <div>
-      <div>
-        <label htmlFor="file" className="sr-only">
-          Choose a file
-        </label>
-        <input id="file" type="file" onChange={handleFileChange} />
+    <div className='App'>
+      <h1 className='Title'>
+        Transcript Processing
+      </h1>
+
+      <div className='Controls'>
+        <FileSelector fileName={fileName} setFileName={setFileName} setContents={setContents}/>
+
+        <div>Speaker 1</div>
+        <div>Speaker 2</div>
+        <div>Add Speaker</div>
+        <div>Speaker Collapse</div>
+        
+
+        <DownloadButton contents={contents}/>
       </div>
 
-      {file && (
-        <section>
-          File details:
-          <ul>
-            <li>Name: {file.name}</li>
-            <li>Type: {file.type}</li>
-            <li>Size: {file.size} bytes</li>
-          </ul>
-        </section>
-      )}
-
+      <div className='Display'>
+        <TextDisplay contents={contents} />
+      </div>
       
 
-      {file && <button onClick={handleDownload}>Download a file</button>}
+      
     </div>
   );
 };
