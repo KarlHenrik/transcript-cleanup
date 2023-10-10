@@ -46,8 +46,8 @@ function SpeakerSettings(props) {
         {speakers[0].map((s, idx) => 
         <div className='SpeakersBox'>
         
-        {editing !== idx && <div key={idx}>Speaker {idx + 1}: <b>{s}</b></div>}
-        {editing === idx && <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPress} placeholder={s} className="SpeakerInput"/>}
+        {editing !== idx && <div key={idx}>{idx + 1}: <b>{s}</b></div>}
+        {editing === idx && <div key={idx}>{idx + 1}: <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPress} placeholder={s} className="SpeakerInput"/></div>}
 
         {editing !== idx && <span onClick={() => {setEditing(idx); setInput(speakers[0][idx])}} className="Edit">&#9998;</span>}
         {editing === idx && <div className="Editing">
@@ -58,6 +58,7 @@ function SpeakerSettings(props) {
         </div>
     )}
     <div className='SpeakersBox'>
+    <div></div>
     {adding && <input value={inputAdding} onInput={e => setInputAdding(e.target.value)} onKeyDown={keyPressAdd} placeholder={""} className="SpeakerInput"/>}
     {!adding && <span onClick={() => {setAdding(true)}} className="Edit">&#10010;</span>}
     {adding && <div className="Editing">

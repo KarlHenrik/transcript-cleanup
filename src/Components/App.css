@@ -1,16 +1,17 @@
 .App {
   text-align: center;
   display: grid;
-  grid-template-columns: 1fr 5fr;
-  grid-template-rows: auto;
+  grid-template-columns: 1fr 6fr;
+  grid-template-rows: 7rem auto;
   grid-template-areas: 
-    "empty header"
+    "controls header"
     "controls display";
 }
 
 .Title {
   grid-area: header;
   text-align: left;
+  padding-left: 4rem;
 }
 
 .Controls {
@@ -18,11 +19,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  justify-content: space-between;
+  background-color: #111;
+  color: white;
+  font-family: "Lato", sans-serif;
+  font-size: 19px;
+  color: #818181;
+  padding: 0.3rem;
+  padding-top: 1rem;
+  position: sticky; 
+  top: 0; 
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.buttonAction {
+  border: 0.15rem solid transparent;
+  margin: 0.5rem;
+}
+.buttonAction:hover {
+  border: 0.15rem solid gray;
+  color: #111;
+  background-color: lightgray;
 }
 
 .Display {
   grid-area: display;
-  white-space: pre-line;
+  text-align: left;
+}
+
+.Tutorial {
+  font-size: 15px;
   text-align: left;
 }

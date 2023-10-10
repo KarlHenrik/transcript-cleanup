@@ -1,8 +1,7 @@
 .TextBox {
-    background-color: rgb(250, 250, 246);
     width: 60%;
     display: grid;
-    grid-template-columns: 10rem auto;
+    grid-template-columns: 12rem auto;
     grid-template-rows: auto;
     grid-template-areas: 
     "speaker time"
@@ -29,4 +28,5 @@
 .Quote {
     grid-area: quote;
     padding-bottom: 1em;
+    white-space: pre-line
 }

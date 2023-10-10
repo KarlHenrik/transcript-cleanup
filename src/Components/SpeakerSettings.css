@@ -1,7 +1,8 @@
 .SpeakersBox {
     display: flex;
-    justify-content: flex-end;
-    width: 20rem;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 16rem;
 }
 
 .RemoveSpeaker {
@@ -9,19 +10,16 @@
     border: 0.15rem solid transparent;;
     color: red;
 }
-
 .RemoveSpeaker:hover {
     border: 0.15rem solid gray;
     background-color: lightgray;
 }
-
 .ReallyRemoveSpeaker {
     width: 1.5rem;
     border: 0.15rem solid transparent;
     background-color: red;
     color: white;
 }
-
 .ReallyRemoveSpeaker:hover {
     border: 0.15rem solid gray;
 }
@@ -30,7 +28,6 @@
     width: 1.5rem;
     border: 0.15rem solid transparent;
 }
-
 .Confirm:hover {
     border: 0.15rem solid gray;
     background-color: lightgray;
@@ -38,13 +35,14 @@
 .Editing {
     width: 3rem;
     display: flex;
+    margin-left: 0.5rem;
 }
 
 .Edit {
+    margin-left: 0.5rem;
     width: 3rem;
     border: 0.15rem solid transparent;
 }
-
 .Edit:hover {
     border: 0.15rem solid gray;
     background-color: lightgray;
