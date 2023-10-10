@@ -5,7 +5,7 @@ function SpeakerSettings(props) {
     const [input, setInput] = useState("");
     const [editing, setEditing] = useState("");
     const [removing, setRemoving] = useState(false);
-    const [inputAdding, setInputAdding] = useState(false);
+    const [inputAdding, setInputAdding] = useState("");
     const [adding, setAdding] = useState(false);
     const speakers = props.speakers;
     
@@ -46,7 +46,7 @@ function SpeakerSettings(props) {
         {speakers[0].map((s, idx) => 
         <div className='SpeakersBox'>
         
-        {editing !== idx && <div key={idx} className='Speaker'>Speaker {idx + 1}: <b>{s}</b></div>}
+        {editing !== idx && <div key={idx}>Speaker {idx + 1}: <b>{s}</b></div>}
         {editing === idx && <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPress} placeholder={s} className="SpeakerInput"/>}
 
         {editing !== idx && <span onClick={() => {setEditing(idx); setInput(speakers[0][idx])}} className="Edit">&#9998;</span>}
