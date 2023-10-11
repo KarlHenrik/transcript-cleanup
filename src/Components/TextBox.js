@@ -164,22 +164,19 @@ function TextBox(props) {
                     let new_texts = [input.slice(0, inds.anchorOffset).trim(),
                                      input.slice(inds.anchorOffset, inds.focusOffset).trim(),
                                      input.slice(inds.focusOffset).trim()]
-                                     .map((e, idx) => ({
-                                        text: e,
+                                     .map((element, idx) => ({
+                                        text: element,
                                         ID: ((idx === 1 && spkr_idx) || (ID)),
                                         }))
-                                     .filter(e => (e.text !== ""))
-                                     .map((e, idx) => ({
-                                        text: e.text,
+                                     .filter(element => (element.text !== ""))
+                                     .map((element, idx) => ({
+                                        text: element.text,
                                         time: ((idx === 0 && props.time) || ("")),
-                                        ID: e.ID,
+                                        ID: element.ID,
                                     }))
-                    console.log(new_texts)
 
-                    const gs = [...props.globalState]
-                    let new_contents = gs[1]
+                    const new_contents = [...props.contents]
                     new_contents.splice(props.idx, 1, ...new_texts);
-                    props.setGlobalState(gs)
                     props.setContents(new_contents)
 
                     e.preventDefault();
