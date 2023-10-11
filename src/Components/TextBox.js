@@ -153,20 +153,26 @@ function TextBox(props) {
             return
         }
         if ((window.getSelection().toString() !== "")) {
-            if (key === (ID+1).toString()) {
+            if (key === (ID+1).toString() && (ID !== "")) {
                 e.preventDefault();
                 return
             }
             props.speakers[0].forEach((c, spkr_idx) => {
                 if (key === String(spkr_idx+1)) {
                     let inds = window.getSelection()
-
-                    let new_texts = [input.slice(0, inds.anchorOffset).trim(),
-                                     input.slice(inds.anchorOffset, inds.focusOffset).trim(),
-                                     input.slice(inds.focusOffset).trim()]
+                    if (inds.anchorNode.className === "Quote") {
+                        setID(spkr_idx);
+                        focusSpeaker();
+                        e.preventDefault();
+                        return
+                    }
+                    let [start, end] = [inds.anchorOffset, inds.focusOffset].toSorted()
+                    let new_texts = [input.slice(0, start).trim(),
+                                     input.slice(start, end).trim(),
+                                     input.slice(end).trim()]
                                      .map((element, idx) => ({
                                         text: element,
-                                        ID: ((idx === 1 && spkr_idx) || (ID)),
+                                        ID: ((idx === 1) ? spkr_idx : ID),
                                         }))
                                      .filter(element => (element.text !== ""))
                                      .map((element, idx) => ({
