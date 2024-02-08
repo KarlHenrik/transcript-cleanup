@@ -48,7 +48,13 @@ function FileSelector(props) {
 }
 
 function time_from_vtt(line_with_time) {
-    return line_with_time.trim().split(/ --> /g)[0].slice(0, -2) // hh:mm:ss:x
+    let trimmed_time = line_with_time.trim()
+                                     .split(/ --> /g)[0]
+                                     .slice(0, -2) // hh:mm:ss:x
+    if (trimmed_time.length == 7) {
+        trimmed_time = "00:" + trimmed_time
+    }
+    return trimmed_time
 }
 
 function read_vtt(raw_text) {

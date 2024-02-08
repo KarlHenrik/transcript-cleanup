@@ -78,7 +78,7 @@ function App() {
         
         <div>
           <div className='buttonAction' onClick={speakerCollapse}>Speaker Collapse</div>
-          <DownloadButton contents={contents} speakers={speakers} />
+          <DownloadButton contents={contents} speakers={speakers} fileName={fileName} />
         </div>
         <Tutorial />
       </div>
