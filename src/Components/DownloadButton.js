@@ -2,6 +2,14 @@ import React from "react";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
+
+function padded_time(time) {
+  if (time.length === 7) {
+    time = "00:" + time
+  }
+  return time
+}
+
 function DownloadButton(props) {
   function handleDownload() {
     let pars = [];
@@ -19,7 +27,7 @@ function DownloadButton(props) {
         new Paragraph({
           children: [
             new TextRun({
-              text: c.time,
+              text: c.time === "" ? "" : padded_time(time),
               break: c.time === "" ? 0 : 1,
               font: "Calibri",
               size: 24,
