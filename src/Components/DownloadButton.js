@@ -27,7 +27,7 @@ function DownloadButton(props) {
         new Paragraph({
           children: [
             new TextRun({
-              text: c.time === "" ? "" : padded_time(time),
+              text: c.time === "" ? "" : padded_time(c.time),
               break: c.time === "" ? 0 : 1,
               font: "Calibri",
               size: 24,
