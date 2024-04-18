@@ -43,29 +43,32 @@ function SpeakerSettings(props) {
     }
 
     return <div>
-        {speakers[0].map((s, idx) => 
-        <div className='SpeakersBox'>
-        
-        {editing !== idx && <div key={idx}>{idx + 1}: <b>{s}</b></div>}
-        {editing === idx && <div key={idx}>{idx + 1}: <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPress} placeholder={s} className="SpeakerInput"/></div>}
+        {speakers[0].map((speaker, idx) => 
+            <div className='SpeakersBox'>
+                {editing !== idx && (<>
+                    <div key={idx}>{idx + 1}: <b>{speaker}</b></div>
+                    <span onClick={() => {setEditing(idx); setInput(speakers[0][idx])}} className="Edit">&#9998;</span>
+                </>)}
 
-        {editing !== idx && <span onClick={() => {setEditing(idx); setInput(speakers[0][idx])}} className="Edit">&#9998;</span>}
-        {editing === idx && <div className="Editing">
-        <span onClick={() => {setEditing(""); renameSpeaker()}} className='Confirm'>&#10004;</span>
-        {!removing && <div className='RemoveSpeaker' onClick={() => setRemoving(true)}>&#10006;</div>}
-        {removing && <div className='ReallyRemoveSpeaker' onClick={removeSpeaker}>&#10006;</div>}
-        </div>}
+                {editing === idx && (<>
+                    <div key={idx}>{idx + 1}: <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPress} placeholder={speaker} className="SpeakerInput"/></div>
+                    <div className="Editing">
+                        <span onClick={() => {setEditing(""); renameSpeaker()}} className='Confirm'>&#10004;</span>
+                        {!removing && <div className='RemoveSpeaker' onClick={() => setRemoving(true)}>&#10006;</div>}
+                        {removing && <div className='ReallyRemoveSpeaker' onClick={removeSpeaker}>&#10006;</div>}
+                    </div>
+                </>)}
+            </div>
+        )}
+        <div className='SpeakersBox'>
+            <div></div>
+            {!adding && <span onClick={() => {setAdding(true); setEditing("")}} className="Edit">&#10010;</span>}
+            {adding && <input value={inputAdding} onInput={e => setInputAdding(e.target.value)} onKeyDown={keyPressAdd} placeholder={""} className="SpeakerInput"/>}
+            {adding && <div className="Editing">
+                <span onClick={() => {addSpeaker()}} className='Confirm'>&#10004;</span>
+                <div className='RemoveSpeaker' onClick={() => setAdding(false)}>&#10006;</div>
+            </div>}
         </div>
-    )}
-    <div className='SpeakersBox'>
-    <div></div>
-    {adding && <input value={inputAdding} onInput={e => setInputAdding(e.target.value)} onKeyDown={keyPressAdd} placeholder={""} className="SpeakerInput"/>}
-    {!adding && <span onClick={() => {setAdding(true)}} className="Edit">&#10010;</span>}
-    {adding && <div className="Editing">
-    <span onClick={() => {addSpeaker()}} className='Confirm'>&#10004;</span>
-    <div className='RemoveSpeaker' onClick={() => setAdding(false)}>&#10006;</div>
-    </div>}
-    </div>
     </div>
 }
 

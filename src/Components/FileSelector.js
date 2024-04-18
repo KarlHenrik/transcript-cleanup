@@ -23,7 +23,7 @@ function FileSelector(props) {
     )
     
     }, [props])
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {'text/vtt': ['.vtt'],}})
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {'text/vtt': ['.vtt']}})
 
     function loadDemo() {
         props.setFileName("test_transcript.vtt")
@@ -54,12 +54,30 @@ function time_from_vtt(line_with_time) {
     return trimmed_time
 }
 
+function parseSpeaker(line) {
+    const regex = /^\[SPEAKER_0?(\d+)\]: (.*)$/;
+    const match = line.match(regex);
+  
+    // If the line matches the pattern, return the speaker ID and the rest of the string
+    if (match) {
+        const speakerID = match[1];
+        const message = match[2];
+        return { speakerID, message };
+    } else {
+        // If the pattern is not matched, return some indication such as null or an error
+        const speakerID = "";
+        const message = line;
+        return { speakerID, message }; // or throw an Error, or return an object with an error property
+    }
+}
+
 function read_vtt(raw_text) {
     const lines = raw_text.split(/\r?\n|\r|\n/g); // Split by newline
     const contents = []
     let sentence_completed = true;
     for (let i = 2; i < lines.length - 1; i+=3) {
-        let new_sentences = lines[i+1].replace(/((?<!\bMr|\bMs|\bMrs)[.?!])\s*(?=[A-Z])/g, "$1|").split("|");
+        const { speakerID, message } = parseSpeaker(lines[i+1]) || {};
+        let new_sentences = message.replace(/((?<!\bMr|\bMs|\bMrs)[.?!])\s*(?=[A-Z])/g, "$1|").split("|");
         if (!sentence_completed) {
             contents[contents.length - 1].text += " " + new_sentences.shift().trim()
         }
@@ -68,7 +86,7 @@ function read_vtt(raw_text) {
                 {
                     text: new_sentences.shift().trim(),
                     time: time_from_vtt(lines[i]),
-                    ID: "",
+                    ID: speakerID,
                 }
             )
         }
@@ -77,7 +95,7 @@ function read_vtt(raw_text) {
                 {
                     text: sentence.trim(),
                     time: "",
-                    ID: "",
+                    ID: speakerID,
                 }
             )
         }

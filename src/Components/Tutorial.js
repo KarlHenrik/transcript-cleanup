@@ -18,6 +18,7 @@ function Tutorial(props) {
         <li>Add cell below with B</li>
         <li>Cut cell with X</li>
         <li>Paste cell with V</li>
+        <li>Swap two speakers by clicking <span onClick={props.speakerSwap}>here</span></li>
         </ul>
   </div>
 }

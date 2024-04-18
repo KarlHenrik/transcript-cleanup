@@ -4,6 +4,7 @@ import FileSelector from './FileSelector';
 import SpeakerSettings from './SpeakerSettings';
 import TextDisplay from './TextDisplay.js';
 import Tutorial from './Tutorial.js';
+import AudioPlayer from './AudioPlayer.js';
 import React, { useState, useEffect } from "react";
 
 function loadLocalStorage(id, initial) {
@@ -62,6 +63,36 @@ function App() {
     setContents(new_contents)
   }
 
+  function speakerSwap() {
+    if (speakers.length !== 2) {
+      return
+    }
+
+    const new_contents = []
+    contents.forEach((element, idx) => {
+      if (element.ID === "") {
+        new_contents.push(
+          {
+            text: element.text,
+            time: element.time,
+            ID: element.ID,
+          }
+        )
+      } else {
+        console.log(element.ID)
+        new_contents.push(
+          {
+            text: element.text,
+            time: element.time,
+            ID: element.ID === 1 ? 0 : 1,
+          }
+        )
+        console.log(element.ID)
+      }
+    });
+    setContents(new_contents)
+  }
+
   return (
     <div className='App'>
       <h1 className='Title'>
@@ -70,9 +101,11 @@ function App() {
       
       <div className='Controls'>
         <div>
-          <div >Active file: {fileName}</div>
+          <div >Active text file: {fileName}</div>
           <div className='buttonAction' onClick={clearAll}>Clear File</div>
         </div>
+
+        <AudioPlayer></AudioPlayer>
         
         <SpeakerSettings speakers={speakers} setSpeakers={setSpeakers} />
         
@@ -80,7 +113,7 @@ function App() {
           <div className='buttonAction' onClick={speakerCollapse}>Speaker Collapse</div>
           <DownloadButton contents={contents} speakers={speakers} fileName={fileName} />
         </div>
-        <Tutorial />
+        <Tutorial speakerSwap={speakerSwap} />
       </div>
 
       <div className='Display'>
