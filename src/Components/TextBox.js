@@ -29,17 +29,8 @@ function focusSpeaker() {
 function TextBox(props) {
     const [ID, setID] = useState(props.ID);
     const [input, setInput] = useState(props.text);
-    const [time, setTime] = useState(props.time)
-
-    useEffect(() => {
-        if (props.speakers[1].length) {
-            if (ID === props.speakers[1]) {
-                setID("");
-            } else if (ID > props.speakers[1]) {
-                setID(ID => ID - 1);
-            }
-        }
-    }, [props.speakers, ID]);
+    const [time, setTime] = useState(props.time);
+    const [speaker, setSpeaker] = useState(props.speaker);
 
     useEffect(() => {
         setInput(props.text)
@@ -47,26 +38,36 @@ function TextBox(props) {
         setTime(props.time)
     }, [props.text, props.ID, props.idx, props.time]);
 
+
     useEffect(() => {
+        setSpeaker(props.speakers[ID]) // If ID is changed from inside, use that
+    }, [ID]);
+
+    useEffect(() => {
+        setSpeaker(props.speakers[props.ID]) // If ID or avaliable speakers is changed from outside, use that
+    }, [props.ID, props.speakers]);
+
+    useEffect(() => {
+        // For small changes, we need to update the stored data without re-rendering TextBox, to maintain responsiveness and UI-usability
         props.contents[props.idx] = {
             text: input,
             time: time,
             ID: ID,
         }
         localStorage.setItem("contents", JSON.stringify(props.contents))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [input, ID, time]);
     
-    function setSpeaker(e) {
+    function speakerKeyDown(e) {
         const key = e.key;
-        props.speakers[0].forEach((c, idx) => {
-            if (key === String(idx+1)) {
-                setID(idx);
+        if (isFinite(key)) { // Not a number
+            const new_ID = Number(key) - 1
+            if (new_ID >= 0 && new_ID <= props.speakers.length - 1) {
+                setID(new_ID);
                 focusNextSpeaker();
                 e.preventDefault();
                 return
             }
-        })
+        }
         if (key === "w" || key === "W" || key === "ArrowUp" ) {
             focusPrevSpeaker();
             e.preventDefault();
@@ -88,8 +89,8 @@ function TextBox(props) {
             return
         }
         if (key === "a" || key === "A") {
-            if (props.num) {
-                props.setnum(false)
+            if (props.cellActionReady) {
+                props.setCellActionReady(false)
                 const new_contents = [...props.contents]
                 new_contents.splice(props.idx, 0, {
                     text: "",
@@ -103,8 +104,8 @@ function TextBox(props) {
             return
         }
         if (key === "b" || key === "B") {
-            if (props.num) {
-                props.setnum(false)
+            if (props.cellActionReady) {
+                props.setCellActionReady(false)
                 const new_contents = [...props.contents]
                 new_contents.splice(props.idx+1, 0, {
                     text: "",
@@ -118,9 +119,8 @@ function TextBox(props) {
             return
         }
         if (key === "x" || key === "X") {
-            console.log(key)
-            if (props.num) {
-                props.setnum(false)
+            if (props.cellActionReady) {
+                props.setCellActionReady(false)
                 props.setCopiedCell({
                     text: input,
                     time: time,
@@ -134,8 +134,8 @@ function TextBox(props) {
             return
         }
         if (key === "v" || key === "V") {
-            if (props.num) {
-                props.setnum(false)
+            if (props.cellActionReady) {
+                props.setCellActionReady(false)
                 const new_contents = [...props.contents]
                 new_contents.splice(props.idx+1, 0, props.copiedCell);
                 props.setContents(new_contents)
@@ -145,58 +145,62 @@ function TextBox(props) {
             return
         }
     }
-    function escapeQuote(e) {
+
+    function quoteKeyDown(e) {
         const key = e.key;
-        if (key === "Tab" || key === "Escape") {
+        if (key === "Tab" || key === "Escape") { // Focus speaker
             focusSpeaker();
             e.preventDefault();
             return
         }
-        if ((window.getSelection().toString() !== "")) {
-            if (key === (ID+1).toString() && (ID !== "")) {
-                e.preventDefault();
-                return
-            }
-            props.speakers[0].forEach((c, spkr_idx) => {
-                if (key === String(spkr_idx+1)) {
-                    let inds = window.getSelection()
-                    if (inds.anchorNode.className === "Quote") {
-                        setID(spkr_idx);
-                        focusSpeaker();
-                        e.preventDefault();
-                        return
-                    }
-                    let [start, end] = [inds.anchorOffset, inds.focusOffset].toSorted()
-                    let new_texts = [input.slice(0, start).trim(),
-                                     input.slice(start, end).trim(),
-                                     input.slice(end).trim()]
-                                     .map((element, idx) => ({
-                                        text: element,
-                                        ID: ((idx === 1) ? spkr_idx : ID),
-                                        }))
-                                     .filter(element => (element.text !== ""))
-                                     .map((element, idx) => ({
-                                        text: element.text,
-                                        time: ((idx === 0 && props.time) || ("")),
-                                        ID: element.ID,
-                                    }))
-
-                    const new_contents = [...props.contents]
-                    new_contents.splice(props.idx, 1, ...new_texts);
-                    props.setContents(new_contents)
-
-                    e.preventDefault();
-                    focusSpeaker();
-                    return
-                }
-            })
+        // Now we check if there is selected text, and if we should assign a new speaker to the selected text
+        if ((window.getSelection().toString() === "")) { // No text selected
+            return
         }
-    }
+        if (!isFinite(key)) { // Not a number
+            return
+        }
+        const new_speaker_ID = Number(key) - 1 // Number from -1 to 8
+        if (new_speaker_ID === ID || new_speaker_ID < 0 || new_speaker_ID >= props.speakers.length) { // Invalid ID
+            e.preventDefault();
+            return
+        }
+        let inds = window.getSelection()
+        if (inds.anchorNode.className === "Quote") {
+            setID(new_speaker_ID);
+            focusSpeaker();
+            e.preventDefault();
+            return
+        }
 
+        let [start, end] = [inds.anchorOffset, inds.focusOffset].toSorted()
+        let new_texts = [input.slice(0, start).trim(),  // Before selection
+                        input.slice(start, end).trim(), // Selection
+                        input.slice(end).trim()]        // After selection
+                        .map((element, idx) => ({
+                            text: element,
+                            ID: ((idx === 1) ? new_speaker_ID : ID),   // Reassign middle ID
+                        }))
+                        .filter(element => (element.text !== ""))      // Remove empty parts
+                        .map((element, idx) => ({
+                            text: element.text,
+                            time: ((idx === 0 && props.time) || ("")), // Remove time from parts not at start
+                            ID: element.ID,
+                        }))
+
+        const new_contents = [...props.contents]
+        new_contents.splice(props.idx, 1, ...new_texts);
+        props.setContents(new_contents)
+
+        e.preventDefault();
+        focusSpeaker();
+        return
+    }
+    
     return <div className="TextBox">
         <div className="Time">{props.time}</div>
-        <div className="Speaker" tabIndex="0" onKeyDown={(e) => {setSpeaker(e);}}>{time && <br />}<b>{props.speakers[0][ID]}{ID!=="" && ": "}{ID==="" && "-"}</b></div>
-        <div className="Quote" tabIndex="0" onKeyDown={(e) => {escapeQuote(e)}} onInput={e => setInput(e.currentTarget.textContent)} contentEditable={true} suppressContentEditableWarning={true}>{props.text}</div>
+        <div className="Speaker" tabIndex="0" style={{ color: speaker && speaker.color}} onKeyDown={(e) => {speakerKeyDown(e);}}>{time && <br />}<b>{speaker && speaker.name}{ID !== "" && ": "}{ID === "" && "-"}</b></div>
+        <div className="Quote" tabIndex="0" onKeyDown={(e) => {quoteKeyDown(e)}} onInput={e => setInput(e.currentTarget.textContent)} contentEditable={true} suppressContentEditableWarning={true}>{props.text}</div>
     </div>
 }
 

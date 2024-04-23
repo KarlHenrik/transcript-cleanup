@@ -1,8 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import './App.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faFileAudio } from '@fortawesome/free-regular-svg-icons';
 
 function AudioPlayerComponent() {
   const [audioFile, setAudioFile] = useState(null);
-  const [playbackRate, setPlaybackRate] = useState(1.0); // Default speed
+  const [audioFileName, setAudioFileName] = useState(null);
   const audioPlayerRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -11,11 +15,12 @@ function AudioPlayerComponent() {
     }
 
     const file = event.target.files[0];
+
     if (file.type !== "audio/mp3" && file.type !== "audio/mpeg") {
         alert("Please select an MP3 file.");
         return
     }
-
+    setAudioFileName(file.name)
     setAudioFile(URL.createObjectURL(file));
   };
 
@@ -80,32 +85,28 @@ function AudioPlayerComponent() {
   }, []); // Still empty because we only want it to run on unmount
   
 
-  const handlePlaybackRateChange = (event) => {
-    const newPlaybackRate = parseFloat(event.target.value);
-    setPlaybackRate(newPlaybackRate);
-
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.playbackRate = newPlaybackRate;
-    }
-  };
+  function clearPlayer() {
+    setAudioFile(null)
+    setAudioFileName(null)
+  }
 
   return (
     <div>
-      <input type="file" accept=".mp3" onChange={handleFileChange} onKeyDown={(e) => e.preventDefault()}/>
-      {audioFile && (
-        <>
+        {audioFileName && <div className='FileName'>
+            {audioFileName}
+            <FontAwesomeIcon className='buttonAction' onClick={clearPlayer} icon={faTrash} />
+        </div>}
+        {!(audioFileName) && <>
+            <input type="file" id="audioFileInput" accept=".mp3" style={{ display: 'none' }} onChange={handleFileChange} onKeyDown={(e) => e.preventDefault()}/>
+            <label className='buttonAction' htmlFor="audioFileInput" >
+                <FontAwesomeIcon className='symbol' icon={faFileAudio}/> Select Audio
+            </label>
+        </>}
+
+        {audioFile && (
+        <div className='AudioPlayer'>
           <audio ref={audioPlayerRef} src={audioFile} controls />
-          <select id="playbackRate" value={playbackRate} onChange={handlePlaybackRateChange}>
-            <option value="0.5">0.5x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1">1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="1.75">1.75x</option>
-            <option value="2">2x</option>
-            {/* Add more options as required */}
-          </select>
-        </>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,8 @@
 import React, {useCallback} from "react";
 import {useDropzone} from 'react-dropzone'
 import "./FileSelector.css"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 
 function FileSelector(props) {
     const onDrop = useCallback((acceptedFiles) => {
@@ -34,6 +36,7 @@ function FileSelector(props) {
 
     return <div>
         <div {...getRootProps()} className="FileSelector">
+            <FontAwesomeIcon className="fa" icon={faFileLines} />
             <input {...getInputProps()} />
             {
             isDragActive ?

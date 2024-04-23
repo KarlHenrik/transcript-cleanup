@@ -5,59 +5,53 @@ import SpeakerSettings from './SpeakerSettings';
 import TextDisplay from './TextDisplay.js';
 import Tutorial from './Tutorial.js';
 import AudioPlayer from './AudioPlayer.js';
-import React, { useState, useEffect } from "react";
-
-function loadLocalStorage(id, initial) {
-    const saved = localStorage.getItem(id);
-    const initialValue = JSON.parse(saved);
-    return initialValue || initial;
-}
+import { useLocalStorage } from "./useLocalStorage.js";
+import React, { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faUsersBetweenLines, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 function App() {
-  const [fileName, setFileName] = useState(loadLocalStorage("fileName", null));
-  const [contents, setContents] = useState(loadLocalStorage("contents", []));
-  const [speakers, setSpeakers] = useState(loadLocalStorage("speakers", [["Researcher", "Interviewee"], []]))
-
-  useEffect(() => {
-      localStorage.setItem("fileName", JSON.stringify(fileName))
-      localStorage.setItem("speakers", JSON.stringify(speakers))
-      localStorage.setItem("contents", JSON.stringify(contents))
-  }, [fileName, contents, speakers])
+  const [fileName, setFileName] = useLocalStorage("fileName", null);
+  const [contents, setContents] = useLocalStorage("contents", []);
+  const [speakers, setSpeakers] = useLocalStorage("speakers", [
+      { name: "Researcher", color: "#000000" },
+      { name: "Interviewee", color: "#000000" },
+    ])
+  const [isExpanded, setIsExpanded] = useState(true);
 
   function clearAll() {
       localStorage.clear();
       setFileName(null)
       setContents([])
-      setSpeakers([["Researcher", "Interviewee"], []])
   }
 
   function speakerCollapse() {
     const new_contents = []
     contents.forEach((element, idx) => {
-      if (idx === 0) {
+      if (idx === 0) { // We only collapse upwards, so first cell is safe
         new_contents.push(
           {
-              text: contents[0].text,
-              time: contents[0].time,
-              ID: contents[0].ID,
+              ...element
           }
         )
-      } else if (element.ID !== "" && element.ID === new_contents[new_contents.length - 1].ID) {
-        let old_text = new_contents[new_contents.length - 1].text;
-        let last_paragraph = old_text.split("\n\n").slice(-1)[0]
-        if ((last_paragraph + " " + element.text).length > 300) {
-          new_contents[new_contents.length - 1].text += "\n\n" + element.text
-        } else {
-          new_contents[new_contents.length - 1].text += " " + element.text;
-        }
+        return
+      }
+      if (element.ID === "" || element.ID !== new_contents[new_contents.length - 1].ID) { // No ID match
+        new_contents.push(
+          {
+              ...element
+          }
+        )
+        return
+      }
+
+      let old_text = new_contents[new_contents.length - 1].text;
+      let last_paragraph = old_text.split("\n\n").slice(-1)[0]
+      if ((last_paragraph + " " + element.text).length > 300) { // Add newlines if the last paragraph is long
+        new_contents[new_contents.length - 1].text += "\n\n" + element.text
       } else {
-        new_contents.push(
-          {
-              text: element.text,
-              time: element.time,
-              ID: element.ID,
-          }
-        )
+        new_contents[new_contents.length - 1].text += " " + element.text;
       }
     });
     setContents(new_contents)
@@ -65,55 +59,77 @@ function App() {
 
   function speakerSwap() {
     if (speakers.length !== 2) {
-      return
+      return;
     }
-
-    const new_contents = []
-    contents.forEach((element, idx) => {
+  
+    const newContents = contents.map(element => {
       if (element.ID === "") {
-        new_contents.push(
-          {
-            text: element.text,
-            time: element.time,
-            ID: element.ID,
-          }
-        )
-      } else {
-        console.log(element.ID)
-        new_contents.push(
-          {
-            text: element.text,
-            time: element.time,
-            ID: element.ID === 1 ? 0 : 1,
-          }
-        )
-        console.log(element.ID)
+        return element;  // Return element unchanged if ID is empty
       }
+  
+      // Swap IDs 1 and 0
+      return {
+        ...element,
+        ID: element.ID === 1 ? 0 : 1,
+      };
     });
-    setContents(new_contents)
+  
+    setContents(newContents);
+  }
+
+  function clearSpeaker(ID) {
+    const newContents = contents.map(element => {
+      if (element.ID === ID) {
+        // If the ID matches, clear it.
+        return { ...element, ID: "" };
+      } else if (element.ID > ID) {
+        // If the ID is greater, decrement it.
+        return { ...element, ID: element.ID - 1 };
+      }
+      // Otherwise, keep the element unchanged.
+      return element;
+    });
+  
+    setContents(newContents);
   }
 
   return (
     <div className='App'>
       <h1 className='Title'>
-        Transcript Cleanup
+        Transcript Cleanup!
       </h1>
       
       <div className='Controls'>
-        <div>
-          <div >Active text file: {fileName}</div>
-          <div className='buttonAction' onClick={clearAll}>Clear File</div>
+        <div className='section'>
+          <h3>Transcript</h3>
+          <div className='FileName'>
+            {fileName || "Select one"}
+            {!(fileName) && <FontAwesomeIcon className='arrow' icon={faArrowRight}/>}
+            {fileName && <FontAwesomeIcon className='buttonAction' onClick={clearAll} icon={faTrash} />}
+          </div>
         </div>
-
-        <AudioPlayer></AudioPlayer>
+    
+        <div className='section'>
+          <h3>Recording</h3>
+          <AudioPlayer></AudioPlayer>
+        </div>
         
-        <SpeakerSettings speakers={speakers} setSpeakers={setSpeakers} />
+        <div className='section'>
+          <h3>Speakers</h3>
+          <SpeakerSettings speakers={speakers} setSpeakers={setSpeakers} clearSpeaker={clearSpeaker}/>
+        </div>
         
-        <div>
-          <div className='buttonAction' onClick={speakerCollapse}>Speaker Collapse</div>
+        <div className='section'>
+          <div className='buttonAction' onClick={speakerCollapse}>
+            <FontAwesomeIcon className="symbol" icon={faUsersBetweenLines} /> Speaker Collapse
+          </div>
           <DownloadButton contents={contents} speakers={speakers} fileName={fileName} />
+          <div className='buttonAction' onClick={() => setIsExpanded(!isExpanded)}>
+          <FontAwesomeIcon className="symbol" icon={faCircleQuestion} /> Help
+          </div>
+          <Tutorial speakerSwap={speakerSwap} isExpanded={isExpanded} />
         </div>
-        <Tutorial speakerSwap={speakerSwap} />
+        
       </div>
 
       <div className='Display'>

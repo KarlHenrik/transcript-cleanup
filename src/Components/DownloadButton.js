@@ -1,7 +1,9 @@
 import React from "react";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileWord } from '@fortawesome/free-regular-svg-icons';
+import './App.css';
 
 function padded_time(time) {
   if (time.length === 7) {
@@ -11,7 +13,11 @@ function padded_time(time) {
 }
 
 function DownloadButton(props) {
+  
   function handleDownload() {
+    if (!(props.fileName)) {
+      return
+    }
     let pars = [];
     props.contents.forEach((c) => {
       let split_text = c.text.split("\n\n").map(
@@ -33,7 +39,7 @@ function DownloadButton(props) {
               size: 24,
             }),
             new TextRun({
-              text: (c.ID !== "" ? props.speakers[0][c.ID] : "-") + ": ",
+              text: (c.ID !== "" ? props.speakers[c.ID].name : "-") + ": ",
               bold: true,
               break: 1,
               font: "Calibri",
@@ -62,7 +68,7 @@ function DownloadButton(props) {
   if (props.contents) {
     return (
       <div onClick={handleDownload} className="buttonAction">
-        Download as Word
+        <FontAwesomeIcon className="symbol" icon={faFileWord} /> Download as Word
       </div>
     );
   } else {

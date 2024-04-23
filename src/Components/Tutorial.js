@@ -1,9 +1,11 @@
-import React from "react";
+import React from 'react';
 
-function Tutorial(props) {
-    return <div className='Tutorial'>
-        <h3>How to:</h3>
-        <ul>
+function Tutorial({ speakerSwap, isExpanded }) {
+  
+
+  return (
+    <div className='Tutorial'>
+      <ul style={{ visibility: isExpanded && "hidden" }}>
         <li>Click to the left of a text cell to select a speaker cell</li>
         <li>Move between speaker cells with ArrowUp/ArrowDown or W/S</li>
         <li>Assign speakers with number keys</li>
@@ -18,10 +20,12 @@ function Tutorial(props) {
         <li>Add cell below with B</li>
         <li>Cut cell with X</li>
         <li>Paste cell with V</li>
-        <li>Swap two speakers by clicking <span onClick={props.speakerSwap}>here</span></li>
-        </ul>
-  </div>
+        <li>Swap two speakers by clicking <span onClick={speakerSwap}>here</span></li>
+      </ul>
+    </div>
+  );
 }
+
 
 export default Tutorial;
 
