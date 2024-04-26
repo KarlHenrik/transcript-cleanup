@@ -25,7 +25,7 @@ function AudioPlayerComponent() {
   };
 
   function timeStringToSeconds(timeStr) {
-    const regex = /((\d):)?(\d?\d):(\d?\d).(\d)/;
+    const regex = /((\d?\d):)?(\d?\d):(\d?\d).(\d)/;
     const match = timeStr.match(regex);
 
     const hrs = match[2] ? match[2] : 0
