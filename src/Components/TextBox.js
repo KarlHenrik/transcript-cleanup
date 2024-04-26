@@ -85,7 +85,7 @@ function TextBox(props) {
             e.preventDefault();
             return
         }
-        if (key === "|" || key === "Backspace") {
+        if (key === "|" || key === "Backspace" || key === "'") {
             setID("");
             e.preventDefault();
             return
@@ -160,7 +160,7 @@ function TextBox(props) {
         if ((window.getSelection().toString() === "")) { // No text selected
             return
         }
-        if (key === "|") {
+        if (key === "|" || key === "'") {
             navigator.clipboard.writeText(window.getSelection().toString() + " (" + time.slice(0, -2) + ")")
             e.preventDefault();
         }
