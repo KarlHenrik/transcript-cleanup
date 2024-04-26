@@ -8,15 +8,15 @@ import AudioPlayer from './AudioPlayer.js';
 import { useLocalStorage } from "./useLocalStorage.js";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faUsersBetweenLines, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faUsersBetweenLines, faArrowRight, faUsersSlash } from '@fortawesome/free-solid-svg-icons';
 import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 function App() {
   const [fileName, setFileName] = useLocalStorage("fileName", null);
   const [contents, setContents] = useLocalStorage("contents", []);
   const [speakers, setSpeakers] = useLocalStorage("speakers", [
-      { name: "Researcher", color: "#000000" },
-      { name: "Interviewee", color: "#000000" },
+      { name: "Researcher", color: "#A83548" },
+      { name: "Interviewee", color: "#369ACC" },
     ])
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -26,9 +26,27 @@ function App() {
       setContents([])
   }
 
-  function speakerCollapse() {
+  function mergeCells() {
     const new_contents = []
+    let stop = false;
     contents.forEach((element, idx) => {
+      if (stop) {
+        new_contents.push(
+          {
+              ...element
+          }
+        )
+        return
+      }
+      if (element.ID === "") {
+        stop = true;
+        new_contents.push(
+          {
+              ...element
+          }
+        )
+        return
+      }
       if (idx === 0) { // We only collapse upwards, so first cell is safe
         new_contents.push(
           {
@@ -77,9 +95,25 @@ function App() {
     setContents(newContents);
   }
 
-  function clearSpeaker(ID) {
+  function clearSpeaker(ID, newID="") {
     const newContents = contents.map(element => {
-      if (element.ID === ID) {
+      if (element.ID == ID) {
+        // If the ID matches, clear it.
+        return { ...element, ID: newID };
+      } else if (element.ID > ID) {
+        // If the ID is greater, decrement it.
+        return { ...element, ID: element.ID - 1 };
+      }
+      // Otherwise, keep the element unchanged.
+      return element;
+    });
+  
+    setContents(newContents);
+  }
+
+  function clearSpeaker(ID) {
+    const new_contents = contents.map(element => {
+      if (element.ID == ID) {
         // If the ID matches, clear it.
         return { ...element, ID: "" };
       } else if (element.ID > ID) {
@@ -90,7 +124,41 @@ function App() {
       return element;
     });
   
-    setContents(newContents);
+    setContents(new_contents);
+  }
+
+  function updateSpeaker(new_contents, ID, newID="") {
+    new_contents = new_contents.map(element => {
+      if (element.ID == ID) {
+        // If the ID matches, clear it.
+        return { ...element, ID: newID };
+      } else if (element.ID > ID) {
+        // If the ID is greater, decrement it.
+        return { ...element, ID: element.ID - 1 };
+      }
+      // Otherwise, keep the element unchanged.
+      return element;
+    });
+  
+    return new_contents;
+  }
+
+  function collapseSpeakers() {
+    let new_speakers = [...speakers];
+    let new_contents = [...contents];
+    // Looping through speakers in reverse, so that when speaker i is removed, all cells with higher IDs can be updated with no unintented effects
+    speakers.toReversed().forEach((speaker, index) => {
+      let originalIndex = speakers.length - index - 1;
+      const firstOccurence = speakers.findIndex(s => s.name === speaker.name)
+      if (firstOccurence === originalIndex) {
+        return
+      } else {
+        new_contents = updateSpeaker(new_contents, originalIndex, firstOccurence)
+        new_speakers.splice(originalIndex, 1)
+      }
+    })
+    setSpeakers(new_speakers)
+    setContents(new_contents)
   }
 
   return (
@@ -120,8 +188,11 @@ function App() {
         </div>
         
         <div className='section'>
-          <div className='buttonAction' onClick={speakerCollapse}>
-            <FontAwesomeIcon className="symbol" icon={faUsersBetweenLines} /> Speaker Collapse
+          <div className='buttonAction' onClick={mergeCells}>
+            <FontAwesomeIcon className="symbol" icon={faUsersBetweenLines} /> Merge Cells
+          </div>
+          <div className='buttonAction' onClick={collapseSpeakers}>
+            <FontAwesomeIcon className="symbol" icon={faUsersSlash} /> Collapse Speakers
           </div>
           <DownloadButton contents={contents} speakers={speakers} fileName={fileName} />
           <div className='buttonAction' onClick={() => setIsExpanded(!isExpanded)}>
@@ -133,7 +204,7 @@ function App() {
       </div>
 
       <div className='Display'>
-        {contents.length===0 && <FileSelector fileName={fileName} setFileName={setFileName} setContents={setContents} />}
+        {contents.length===0 && <FileSelector fileName={fileName} setFileName={setFileName} setContents={setContents} speakers={speakers} setSpeakers={setSpeakers} />}
         {contents && <TextDisplay contents={contents} setContents={setContents} speakers={speakers} />}
       </div>
     </div>

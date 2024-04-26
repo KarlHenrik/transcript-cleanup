@@ -148,6 +148,7 @@ function TextBox(props) {
 
     function quoteKeyDown(e) {
         const key = e.key;
+        console.log(key)
         if (key === "Tab" || key === "Escape") { // Focus speaker
             focusSpeaker();
             e.preventDefault();
@@ -157,7 +158,11 @@ function TextBox(props) {
         if ((window.getSelection().toString() === "")) { // No text selected
             return
         }
-        if (!isFinite(key)) { // Not a number
+        if (key === "|") {
+            navigator.clipboard.writeText(window.getSelection().toString() + " (" + time.slice(0, -2) + ")")
+            e.preventDefault();
+        }
+        if (!isFinite(key) || key === " ") { // Not a number
             return
         }
         const new_speaker_ID = Number(key) - 1 // Number from -1 to 8

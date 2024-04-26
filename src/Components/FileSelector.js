@@ -16,7 +16,9 @@ function FileSelector(props) {
                 file
                     .text()
                     .then((t) => {
-                        props.setContents(read_vtt(t));
+                        const new_contents = read_vtt(t);
+                        props.setContents(new_contents);
+                        pad_speakers(new_contents, props.speakers, props.setSpeakers)
                     });
             }
             reader.readAsArrayBuffer(file)
@@ -60,10 +62,9 @@ function time_from_vtt(line_with_time) {
 function parseSpeaker(line) {
     const regex = /^\[SPEAKER_0?(\d+)\]: (.*)$/;
     const match = line.match(regex);
-  
     // If the line matches the pattern, return the speaker ID and the rest of the string
     if (match) {
-        const speakerID = match[1];
+        const speakerID = Number(match[1]);
         const message = match[2];
         return { speakerID, message };
     } else {
@@ -74,8 +75,32 @@ function parseSpeaker(line) {
     }
 }
 
+function pad_speakers(contents, speakers, setSpeakers) {
+    const new_speakers = [...speakers];
+    let maxId = contents
+        .filter(obj => obj.ID !== "") // Exclude objects with empty ID
+        .map(obj => Number(obj.ID)) // Convert ID values to numbers
+        .reduce((max, ID) => Math.max(max, ID), -1);
+    let padding = maxId - speakers.length + 1
+    while (padding > 0) {
+        new_speakers.push({name: "Speaker " + new_speakers.length, ID: new_speakers.length})
+        padding = padding - 1;
+    }
+    setSpeakers(new_speakers)
+}
+
 function read_vtt(raw_text) {
     const lines = raw_text.split(/\r?\n|\r|\n/g); // Split by newline
+    
+    if ( lines[3].includes("[A") ) { // Check for newer format where lines 4 is split over two lines, with info about tech used.
+        let startIndex = lines[3].indexOf("[A");
+        let endIndex = lines[3].indexOf("]", startIndex);
+        if (endIndex !== -1) {
+          lines[3] = lines[3].substring(0, startIndex) + lines[4];
+          lines.splice(4, 1);
+        }
+    }
+    
     const contents = []
     let sentence_completed = true;
     for (let i = 2; i < lines.length - 1; i+=3) {
