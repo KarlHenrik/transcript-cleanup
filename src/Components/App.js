@@ -95,25 +95,9 @@ function App() {
     setContents(newContents);
   }
 
-  function clearSpeaker(ID, newID="") {
-    const newContents = contents.map(element => {
-      if (element.ID == ID) {
-        // If the ID matches, clear it.
-        return { ...element, ID: newID };
-      } else if (element.ID > ID) {
-        // If the ID is greater, decrement it.
-        return { ...element, ID: element.ID - 1 };
-      }
-      // Otherwise, keep the element unchanged.
-      return element;
-    });
-  
-    setContents(newContents);
-  }
-
   function clearSpeaker(ID) {
     const new_contents = contents.map(element => {
-      if (element.ID == ID) {
+      if (element.ID === ID) {
         // If the ID matches, clear it.
         return { ...element, ID: "" };
       } else if (element.ID > ID) {
@@ -129,7 +113,7 @@ function App() {
 
   function updateSpeaker(new_contents, ID, newID="") {
     new_contents = new_contents.map(element => {
-      if (element.ID == ID) {
+      if (element.ID === ID) {
         // If the ID matches, clear it.
         return { ...element, ID: newID };
       } else if (element.ID > ID) {

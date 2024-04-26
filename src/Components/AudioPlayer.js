@@ -56,10 +56,12 @@ function AudioPlayerComponent() {
       case 't':
         if (!document.activeElement.classList.contains('Speaker')) break; // Has to be focusing speaker
         if (!document.activeElement.previousSibling.firstChild) break; // Has to be next to timestamp
-        
         const newPositionInSeconds = timeStringToSeconds(document.activeElement.previousSibling.firstChild.data);
         audioPlayerRef.current.currentTime = newPositionInSeconds;
         audioPlayerRef.current.play();
+        break;
+      default:
+        break;
       // Add more key controls as needed
     }
   };
@@ -72,6 +74,7 @@ function AudioPlayerComponent() {
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array so it only runs on mount and unmount
   
   useEffect(() => {
@@ -82,6 +85,7 @@ function AudioPlayerComponent() {
         setAudioFile(null);
       }
     };
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Still empty because we only want it to run on unmount
   
 

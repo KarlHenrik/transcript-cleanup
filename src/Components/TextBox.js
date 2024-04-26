@@ -41,6 +41,7 @@ function TextBox(props) {
 
     useEffect(() => {
         setSpeaker(props.speakers[ID]) // If ID is changed from inside, use that
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ID]);
 
     useEffect(() => {
@@ -55,6 +56,7 @@ function TextBox(props) {
             ID: ID,
         }
         localStorage.setItem("contents", JSON.stringify(props.contents))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [input, ID, time]);
     
     function speakerKeyDown(e) {
