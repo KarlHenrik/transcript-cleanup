@@ -5,14 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { Cell, Speaker } from './types';
 
-type DownloadButtonProps = {
+type FileSelector = {
   setFileName: (name: string) => void;
   setSpeakers: (speakers: Speaker[]) => void;
   setContents: (cells: Cell[]) => void;
   speakers: Speaker[];
 };
 
-function FileSelector({setFileName, setSpeakers, setContents, speakers}: DownloadButtonProps) {
+function FileSelector({setFileName, setSpeakers, setContents, speakers}: FileSelector) {
     function loadFile(acceptedFiles: File[]): void {
         acceptedFiles.forEach((file: File) => {
             const reader = new FileReader()

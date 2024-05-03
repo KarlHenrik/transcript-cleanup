@@ -10,11 +10,12 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faUsersBetweenLines, faArrowRight, faUsersSlash } from '@fortawesome/free-solid-svg-icons';
 import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
+import { Cell, Speaker } from './types';
 
 function App() {
-  const [fileName, setFileName] = useLocalStorage("fileName", null);
-  const [contents, setContents] = useLocalStorage("contents", []);
-  const [speakers, setSpeakers] = useLocalStorage("speakers", [
+  const [fileName, setFileName] = useLocalStorage<string | null>("fileName", null);
+  const [contents, setContents] = useLocalStorage<Cell[] | null>("contents", []);
+  const [speakers, setSpeakers] = useLocalStorage<Speaker[]>("speakers", [
       { name: "Researcher", color: "#A83548" },
       { name: "Interviewee", color: "#369ACC" },
     ])
@@ -27,9 +28,9 @@ function App() {
   }
 
   function mergeCells() {
-    const new_contents = []
+    const new_contents: Cell[] = []
     let stop = false;
-    contents.forEach((element, idx) => {
+    contents?.forEach((element, idx) => {
       if (stop) {
         new_contents.push(
           {
@@ -38,7 +39,7 @@ function App() {
         )
         return
       }
-      if (element.ID === "") {
+      if (element.ID === null) {
         stop = true;
         new_contents.push(
           {
@@ -55,7 +56,7 @@ function App() {
         )
         return
       }
-      if (element.ID === "" || element.ID !== new_contents[new_contents.length - 1].ID) { // No ID match
+      if (element.ID === null || element.ID !== new_contents[new_contents.length - 1].ID) { // No ID match
         new_contents.push(
           {
               ...element
@@ -64,8 +65,8 @@ function App() {
         return
       }
 
-      let old_text = new_contents[new_contents.length - 1].text;
-      let last_paragraph = old_text.split("\n\n").slice(-1)[0]
+      const old_text = new_contents[new_contents.length - 1].text;
+      const last_paragraph = old_text.split("\n\n").slice(-1)[0]
       if ((last_paragraph + " " + element.text).length > 300) { // Add newlines if the last paragraph is long
         new_contents[new_contents.length - 1].text += "\n\n" + element.text
       } else {
@@ -76,12 +77,13 @@ function App() {
   }
 
   function speakerSwap() {
+    if (contents === null) return
     if (speakers.length !== 2) {
       return;
     }
-  
+
     const newContents = contents.map(element => {
-      if (element.ID === "") {
+      if (element.ID === null) {
         return element;  // Return element unchanged if ID is empty
       }
   
@@ -95,11 +97,13 @@ function App() {
     setContents(newContents);
   }
 
-  function clearSpeaker(ID) {
+  function clearSpeaker(ID: number) {
+    if (contents === null) return
     const new_contents = contents.map(element => {
+      if (element.ID === null) return element
       if (element.ID === ID) {
         // If the ID matches, clear it.
-        return { ...element, ID: "" };
+        return { ...element, ID: null };
       } else if (element.ID > ID) {
         // If the ID is greater, decrement it.
         return { ...element, ID: element.ID - 1 };
@@ -111,8 +115,9 @@ function App() {
     setContents(new_contents);
   }
 
-  function updateSpeaker(new_contents, ID, newID="") {
+  function updateSpeaker(new_contents: Cell[], ID: number, newID: number | null=null) {
     new_contents = new_contents.map(element => {
+      if (element.ID === null) return element
       if (element.ID === ID) {
         // If the ID matches, clear it.
         return { ...element, ID: newID };
@@ -128,11 +133,14 @@ function App() {
   }
 
   function collapseSpeakers() {
-    let new_speakers = [...speakers];
-    let new_contents = [...contents];
+    if (contents === null) {
+      return
+    }
+    const new_speakers: Speaker[] = [...speakers];
+    let new_contents: Cell[] = [...contents];
     // Looping through speakers in reverse, so that when speaker i is removed, all cells with higher IDs can be updated with no unintented effects
     speakers.toReversed().forEach((speaker, index) => {
-      let originalIndex = speakers.length - index - 1;
+      const originalIndex = speakers.length - index - 1;
       const firstOccurence = speakers.findIndex(s => s.name === speaker.name)
       if (firstOccurence === originalIndex) {
         return
@@ -188,7 +196,7 @@ function App() {
       </div>
 
       <div className='Display'>
-        {contents.length===0 && <FileSelector fileName={fileName} setFileName={setFileName} setContents={setContents} speakers={speakers} setSpeakers={setSpeakers} />}
+        {contents?.length===0 && <FileSelector setFileName={setFileName} setContents={setContents} speakers={speakers} setSpeakers={setSpeakers} />}
         {contents && <TextDisplay contents={contents} setContents={setContents} speakers={speakers} />}
       </div>
     </div>

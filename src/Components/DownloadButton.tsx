@@ -7,8 +7,8 @@ import './App.css';
 import { Cell, Speaker } from './types';
 
 type DownloadButtonProps = {
-  fileName: string;
-  contents: Cell[];
+  fileName: string | null;
+  contents: Cell[] | null;
   speakers: Speaker[];
 };
 
@@ -19,7 +19,7 @@ function DownloadButton({fileName, contents, speakers}: DownloadButtonProps) {
       return
     }
     const pars: Paragraph[] = [];
-    contents.forEach((c) => {
+    contents?.forEach((c) => {
       const split_text = c.text.split("\n\n").map(
         (line, idx) =>
           new TextRun({
