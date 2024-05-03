@@ -1,11 +1,11 @@
 import './App.css';
-import DownloadButton from './DownloadButton.js';
+import DownloadButton from './DownloadButton';
 import FileSelector from './FileSelector';
 import SpeakerSettings from './SpeakerSettings';
-import TextDisplay from './TextDisplay.js';
-import Tutorial from './Tutorial.js';
-import AudioPlayer from './AudioPlayer.js';
-import { useLocalStorage } from "./useLocalStorage.js";
+import TextDisplay from './TextDisplay';
+import Tutorial from './Tutorial';
+import AudioPlayer from './AudioPlayer';
+import { useLocalStorage } from "./useLocalStorage";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faUsersBetweenLines, faArrowRight, faUsersSlash } from '@fortawesome/free-solid-svg-icons';
@@ -193,6 +193,6 @@ function App() {
       </div>
     </div>
   );
-};
+}
 
 export default App;

@@ -1,11 +1,16 @@
 import React from 'react';
 
-function Tutorial({ speakerSwap, isExpanded }) {
-  
+type TutorialProps = {
+  speakerSwap: () => void;
+  isExpanded: boolean;
+};
+
+function Tutorial({ speakerSwap, isExpanded }: TutorialProps) {
+  // Component logic here
 
   return (
-    <div className='Tutorial'>
-      <ul style={{ visibility: isExpanded && "hidden" }}>
+    <div   className='Tutorial'>
+         <ul style={{ visibility: isExpanded ? "hidden" : undefined}}>
         <li>Click to the left of a text cell to select a speaker cell</li>
         <li>Move between speaker cells with ArrowUp/ArrowDown or W/S</li>
         <li>Assign speakers with number keys</li>
