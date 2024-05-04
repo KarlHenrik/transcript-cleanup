@@ -1,11 +1,10 @@
 import React from 'react';
 
 type TutorialProps = {
-  speakerSwap: () => void;
   isExpanded: boolean;
 };
 
-function Tutorial({ speakerSwap, isExpanded }: TutorialProps) {
+function Tutorial({ isExpanded }: TutorialProps) {
   // Component logic here
 
   return (
@@ -25,7 +24,7 @@ function Tutorial({ speakerSwap, isExpanded }: TutorialProps) {
         <li>Add cell below with B</li>
         <li>Cut cell with X</li>
         <li>Paste cell with V</li>
-        <li>Swap two speakers by clicking <span onClick={speakerSwap}>here</span></li>
+        <li>Swap two speakers by clicking <span>here</span></li>
       </ul>
     </div>
   );

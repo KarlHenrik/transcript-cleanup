@@ -3,16 +3,15 @@ import {useDropzone} from 'react-dropzone'
 import "./FileSelector.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { Cell, Speaker } from './types';
+import { Cell, Speaker, Action } from './types';
 
 type FileSelector = {
   setFileName: (name: string) => void;
-  setSpeakers: (speakers: Speaker[]) => void;
-  setContents: (cells: Cell[]) => void;
+  dispatch: React.Dispatch<Action>;
   speakers: Speaker[];
 };
 
-function FileSelector({setFileName, setSpeakers, setContents, speakers}: FileSelector) {
+function FileSelector({setFileName, dispatch, speakers}: FileSelector) {
     function loadFile(acceptedFiles: File[]): void {
         acceptedFiles.forEach((file: File) => {
             const reader = new FileReader()
@@ -25,8 +24,12 @@ function FileSelector({setFileName, setSpeakers, setContents, speakers}: FileSel
                     .text()
                     .then((t) => {
                         const new_contents = read_vtt(t);
-                        setContents(new_contents);
-                        pad_speakers(new_contents, speakers, setSpeakers)
+                        dispatch({
+                            type: "setContents",
+                            payload: {
+                                contents: new_contents
+                            }
+                        })
                     });
             }
             reader.readAsArrayBuffer(file)
@@ -34,13 +37,20 @@ function FileSelector({setFileName, setSpeakers, setContents, speakers}: FileSel
         }
         )
     }
-    const onDrop = useCallback(loadFile, [setFileName, setContents, setSpeakers, speakers]);
+    const onDrop = useCallback(loadFile, [setFileName, speakers]);
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {'text/vtt': ['.vtt']}})
 
     function loadDemo() {
+        // TODO this will not work
         setFileName("test_transcript.vtt")
-        setContents(JSON.parse('[{"text":"No, my father didn\'t fight in the wars.","time":"00:00.0","ID":""},{"text":"He was a navigator on a spice freighter.","time":"","ID":""},{"text":"That\'s what your uncle told you.","time":"00:07.0","ID":""},{"text":"He didn\'t hold with your father\'s ideals, thought he should have stayed here and not gotten involved.","time":"","ID":""},{"text":"You fought in the Clone Wars?","time":"00:12.0","ID":""},{"text":"Yes.","time":"00:17.0","ID":""},{"text":"I was once a Jedi Knight, the same as your father.","time":"","ID":""},{"text":"I wish I\'d known that.","time":"00:24.0","ID":""},{"text":"He was the best star pilot in the galaxy.","time":"","ID":""},{"text":"And a cunning warrior.","time":"00:29.0","ID":""},{"text":"I understand you\'ve become quite a good pilot yourself.","time":"","ID":""},{"text":"And he was a good friend.","time":"00:36.0","ID":""},{"text":"Which reminds me, I have something here for you.","time":"00:39.0","ID":""},{"text":"Your father wanted you to have this when you were old enough, but your uncle wouldn\'t allow it.","time":"00:45.0","ID":""},{"text":"He feared you might follow old Obi-Wan on some damn fool idealistic crusade like your father did.","time":"00:51.0","ID":""},{"text":"Sir, if you\'ll not be needing me, I\'ll close down for a while.","time":"00:57.0","ID":""},{"text":"Sure, go ahead.","time":"01:00.0","ID":""},{"text":"What is it?","time":"01:04.0","ID":""},{"text":"Your father\'s lightsaber.","time":"01:06.0","ID":""},{"text":"This is the weapon of a Jedi Knight.","time":"","ID":""},{"text":"Not as clumsy or random as a blaster.","time":"01:11.0","ID":""},{"text":"An elegant weapon for a more civilized age.","time":"01:15.0","ID":""},{"text":"For over a thousand generations, the Jedi Knights were the guardians of peace and justice in the Old Republic.","time":"01:21.0","ID":""},{"text":"Before the Dark Times.","time":"01:28.0","ID":""},{"text":"Before the Empire.","time":"","ID":""},{"text":"How did my father die?","time":"01:35.0","ID":""},{"text":"A young Jedi named Darth Vader, who was a pupil of mine until he turned to evil, helped the Empire hunt down and destroy the Jedi Knights.","time":"01:39.0","ID":""},{"text":"He betrayed and murdered your father.","time":"01:50.0","ID":""},{"text":"Now the Jedi are all but extinct.","time":"01:54.0","ID":""},{"text":"Vader was seduced by the dark side of the Force.","time":"01:58.0","ID":""},{"text":"The Force?","time":"02:03.0","ID":""},{"text":"The Force is what gives a Jedi his power.","time":"02:05.0","ID":""},{"text":"It\'s an energy field created by all living things.","time":"02:08.0","ID":""},{"text":"It surrounds us, penetrates us, it binds the galaxy together.","time":"02:11.0","ID":""}]'))
-        
+        const {contents, speakers} = JSON.parse('[{"text":"No, my father didn\'t fight in the wars.","time":"00:00.0","ID":""},{"text":"He was a navigator on a spice freighter.","time":"","ID":""},{"text":"That\'s what your uncle told you.","time":"00:07.0","ID":""},{"text":"He didn\'t hold with your father\'s ideals, thought he should have stayed here and not gotten involved.","time":"","ID":""},{"text":"You fought in the Clone Wars?","time":"00:12.0","ID":""},{"text":"Yes.","time":"00:17.0","ID":""},{"text":"I was once a Jedi Knight, the same as your father.","time":"","ID":""},{"text":"I wish I\'d known that.","time":"00:24.0","ID":""},{"text":"He was the best star pilot in the galaxy.","time":"","ID":""},{"text":"And a cunning warrior.","time":"00:29.0","ID":""},{"text":"I understand you\'ve become quite a good pilot yourself.","time":"","ID":""},{"text":"And he was a good friend.","time":"00:36.0","ID":""},{"text":"Which reminds me, I have something here for you.","time":"00:39.0","ID":""},{"text":"Your father wanted you to have this when you were old enough, but your uncle wouldn\'t allow it.","time":"00:45.0","ID":""},{"text":"He feared you might follow old Obi-Wan on some damn fool idealistic crusade like your father did.","time":"00:51.0","ID":""},{"text":"Sir, if you\'ll not be needing me, I\'ll close down for a while.","time":"00:57.0","ID":""},{"text":"Sure, go ahead.","time":"01:00.0","ID":""},{"text":"What is it?","time":"01:04.0","ID":""},{"text":"Your father\'s lightsaber.","time":"01:06.0","ID":""},{"text":"This is the weapon of a Jedi Knight.","time":"","ID":""},{"text":"Not as clumsy or random as a blaster.","time":"01:11.0","ID":""},{"text":"An elegant weapon for a more civilized age.","time":"01:15.0","ID":""},{"text":"For over a thousand generations, the Jedi Knights were the guardians of peace and justice in the Old Republic.","time":"01:21.0","ID":""},{"text":"Before the Dark Times.","time":"01:28.0","ID":""},{"text":"Before the Empire.","time":"","ID":""},{"text":"How did my father die?","time":"01:35.0","ID":""},{"text":"A young Jedi named Darth Vader, who was a pupil of mine until he turned to evil, helped the Empire hunt down and destroy the Jedi Knights.","time":"01:39.0","ID":""},{"text":"He betrayed and murdered your father.","time":"01:50.0","ID":""},{"text":"Now the Jedi are all but extinct.","time":"01:54.0","ID":""},{"text":"Vader was seduced by the dark side of the Force.","time":"01:58.0","ID":""},{"text":"The Force?","time":"02:03.0","ID":""},{"text":"The Force is what gives a Jedi his power.","time":"02:05.0","ID":""},{"text":"It\'s an energy field created by all living things.","time":"02:08.0","ID":""},{"text":"It surrounds us, penetrates us, it binds the galaxy together.","time":"02:11.0","ID":""}]')
+        dispatch({
+            type: "setState",
+            payload: {
+                contents: contents,
+                speakers: speakers
+            }
+        })
         return
     }
 
@@ -82,23 +92,6 @@ function parseSpeaker(line: string) {
     }
 }
 
-function pad_speakers(contents: Cell[], speakers: Speaker[], setSpeakers: (speakers: Speaker[]) => void) {
-    const new_speakers = [...speakers];
-    const maxId = contents
-        .filter(obj => obj.ID !== null) // Exclude objects with empty ID
-        .map(obj => Number(obj.ID)) // Convert ID values to numbers
-        .reduce((max, ID) => Math.max(max, ID), -1);
-    let padding = maxId - speakers.length + 1
-    while (padding > 0) {
-        new_speakers.push({
-            name: "Speaker " + new_speakers.length,
-            color: "black"
-        })
-        padding = padding - 1;
-    }
-    setSpeakers(new_speakers)
-}
-
 function read_vtt(raw_text: string): Cell[] {
     const lines = raw_text.split(/\r?\n|\r|\n/g); // Split by newline
     
@@ -125,6 +118,7 @@ function read_vtt(raw_text: string): Cell[] {
                     text: new_sentences.shift()?.trim() || "",
                     time: time_from_vtt(lines[i]),
                     ID: speakerID,
+                    speaker: null,
                 }
             )
         }
@@ -134,6 +128,7 @@ function read_vtt(raw_text: string): Cell[] {
                     text: sentence.trim(),
                     time: "",
                     ID: speakerID,
+                    speaker: null
                 }
             )
         }

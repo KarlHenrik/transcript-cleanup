@@ -4,14 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { Speaker } from './types';
 import { KeyboardEvent, ChangeEvent } from 'react';
+import { Action } from "./types";
 
 type SpeakerSettignsProps = {
-  setSpeakers: (speakers: Speaker[]) => void;
+  dispatch: React.Dispatch<Action>;
   speakers: Speaker[];
-  clearSpeaker: (editing: number) => void;
 };
 
-function SpeakerSettings({speakers, setSpeakers, clearSpeaker}: SpeakerSettignsProps) {
+function SpeakerSettings({speakers, dispatch}: SpeakerSettignsProps) {
     const [input, setInput] = useState("");
     const [editing, setEditing] = useState<number | null>(null);
     const [removing, setRemoving] = useState(false);
@@ -25,20 +25,27 @@ function SpeakerSettings({speakers, setSpeakers, clearSpeaker}: SpeakerSettignsP
     }
     function renameSpeaker() {
         if (editing === null) return
-        const new_speakers = [...speakers]
-        new_speakers[editing].name = input
-        new_speakers[editing].color = colorSelected;
-        setSpeakers(new_speakers);
+        dispatch({
+            type: 'updateSpeaker',
+            payload: {
+                ID: editing,
+                speaker: {
+                    name: input,
+                    color: colorSelected
+                }
+            }})
+
         setEditing(null);
         setInput("");
         setRemoving(false)
     }
     function removeSpeaker() {
         if (editing === null) return
-        const new_speakers = [...speakers]
-        new_speakers.splice(editing, 1)
-        setSpeakers(new_speakers)
-        clearSpeaker(editing)
+        dispatch({
+            type: 'deleteSpeaker',
+            payload: {
+                ID: editing
+            }})
         setRemoving(false)
         setEditing(null);
     }
@@ -49,7 +56,11 @@ function SpeakerSettings({speakers, setSpeakers, clearSpeaker}: SpeakerSettignsP
     }
     function addSpeaker() {
         if (input !== "") {
-            setSpeakers([...speakers, {name: input, color: "Black"}])
+            dispatch({
+                type: 'addSpeaker',
+                payload: {
+                    speaker: {name: input, color: "Black"}
+                }})
             setInput("")
             setAdding(false)
         }
