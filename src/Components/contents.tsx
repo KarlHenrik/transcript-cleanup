@@ -110,6 +110,7 @@ function reducer(state: State, action: Action) {
             }
         }
         case 'updateCellText': {
+            // IMPORTANT: This dispatch mutates in-place. This might lead to bugs later. 
             const {text, idx}: {text: string, idx: number} = action.payload
 
             const oldCell = state.contents[idx]
@@ -117,10 +118,9 @@ function reducer(state: State, action: Action) {
                 ...oldCell,
                 text: text,
             })
-            return {
-                ...state,
-                contents: new_contents
-            }
+            state.contents = new_contents
+            localStorage.setItem("state", JSON.stringify(state));
+            return state
         }
         case 'setState': {
             const {new_contents, new_speakers} = makeStateConsistent(action.payload.contents, action.payload.speakers);
@@ -204,6 +204,10 @@ function reducer(state: State, action: Action) {
             return {
                 ...state,
                 contents: [],
+                speakers: [
+                    { name: "Researcher", color: "#A83548" },
+                    { name: "Interviewee", color: "#369ACC" },
+                  ],
                 copiedCell: null,
             };
         }
