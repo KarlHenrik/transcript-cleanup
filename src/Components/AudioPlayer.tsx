@@ -5,11 +5,11 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faFileAudio } from '@fortawesome/free-regular-svg-icons';
 
 function AudioPlayerComponent() {
-  const [audioFile, setAudioFile] = useState(null);
-  const [audioFileName, setAudioFileName] = useState(null);
-  const audioPlayerRef = useRef(null);
+  const [audioFile, setAudioFile] = useState<string | null>(null);
+  const [audioFileName, setAudioFileName] = useState<string | null>(null);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!(event.target.files && event.target.files[0])) {
         return // No file
     }
@@ -24,41 +24,48 @@ function AudioPlayerComponent() {
     setAudioFile(URL.createObjectURL(file));
   };
 
-  function timeStringToSeconds(timeStr) {
+  function timeStringToSeconds(timeStr: string): number {
     const regex = /((\d?\d):)?(\d?\d):(\d?\d).(\d)/;
     const match = timeStr.match(regex);
+    if (match === null) return 0
 
-    const hrs = match[2] ? match[2] : 0
-    const min = match[3]
-    const seconds = match[4]
-    const tensOfSeconds = match[5]
+    const hrs = match[2] ? Number(match[2]) : 0
+    const min = Number(match[3])
+    const seconds = Number(match[4])
+    const tensOfSeconds = Number(match[5])
     return hrs * 3600 + min * 60 + seconds * 1 + tensOfSeconds * 0.1
   }
 
-  const handleKeyPress = (event) => {
-    if (!audioPlayerRef.current || document.activeElement.classList.contains('SpeakerInput') || document.activeElement.classList.contains('Quote')) return;
+  const handleKeyPress = (event: KeyboardEvent): void => {
+    const audioPlayerRefCurrent = audioPlayerRef.current;
+    const activeElement = document.activeElement;
+
+    if (!audioPlayerRefCurrent || activeElement?.classList.contains('SpeakerInput') || activeElement?.classList.contains('Quote')) {
+      return;
+    }
 
     switch (event.key) {
       case ' ': // Spacebar: toggle play/pause
         event.preventDefault(); // Prevent default spacebar action (page down)
-        if (audioPlayerRef.current.paused) {
-          audioPlayerRef.current.play();
+        if (audioPlayerRefCurrent.paused) {
+          audioPlayerRefCurrent.play();
         } else {
-          audioPlayerRef.current.pause();
+          audioPlayerRefCurrent.pause();
         }
         break;
       case 'r': // 'R' key: rewind 10 seconds
-        audioPlayerRef.current.currentTime = Math.max(0, audioPlayerRef.current.currentTime - 10);
+        audioPlayerRefCurrent.currentTime = Math.max(0, audioPlayerRefCurrent.currentTime - 10);
         break;
       case 'f':
-        audioPlayerRef.current.currentTime = Math.min(audioPlayerRef.current.duration, audioPlayerRef.current.currentTime + 10);
+        audioPlayerRefCurrent.currentTime = Math.min(audioPlayerRefCurrent.duration, audioPlayerRefCurrent.currentTime + 10);
         break;
       case 't':
-        if (!document.activeElement.classList.contains('Speaker')) break; // Has to be focusing speaker
-        if (!document.activeElement.previousSibling.firstChild) break; // Has to be next to timestamp
-        const newPositionInSeconds = timeStringToSeconds(document.activeElement.previousSibling.firstChild.data);
-        audioPlayerRef.current.currentTime = newPositionInSeconds;
-        audioPlayerRef.current.play();
+        if (!activeElement?.classList.contains('Speaker')) break; // Has to be focusing speaker
+        if (!activeElement?.previousSibling?.firstChild) break; // Has to be next to timestamp
+        if (!(activeElement.previousSibling.firstChild instanceof Text)) break;
+
+        audioPlayerRefCurrent.currentTime = timeStringToSeconds(activeElement.previousSibling.firstChild.data)
+        audioPlayerRefCurrent.play();
         break;
       default:
         break;
@@ -74,7 +81,6 @@ function AudioPlayerComponent() {
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array so it only runs on mount and unmount
   
   useEffect(() => {
@@ -85,7 +91,6 @@ function AudioPlayerComponent() {
         setAudioFile(null);
       }
     };
-// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Still empty because we only want it to run on unmount
   
 

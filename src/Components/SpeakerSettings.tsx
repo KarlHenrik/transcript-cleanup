@@ -2,45 +2,65 @@ import React, { useState } from "react";
 import "./SpeakerSettings.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { Speaker } from './types';
+import { KeyboardEvent, ChangeEvent } from 'react';
+import { Action } from "./types";
 
-function SpeakerSettings(props) {
+type SpeakerSettignsProps = {
+  dispatch: React.Dispatch<Action>;
+  speakers: Speaker[];
+};
+
+function SpeakerSettings({speakers, dispatch}: SpeakerSettignsProps) {
     const [input, setInput] = useState("");
-    const [editing, setEditing] = useState("");
+    const [editing, setEditing] = useState<number | null>(null);
     const [removing, setRemoving] = useState(false);
     const [adding, setAdding] = useState(false);
     const [colorSelected, setColor] = useState('');  // You can set defaults if needed
-    const speakers = props.speakers;
-    
-    function keyPress(e) {
+        
+    function keyPress(e: KeyboardEvent<HTMLInputElement>) {
         if (e.key === "Enter") {
             renameSpeaker()
         }
     }
     function renameSpeaker() {
-        const new_speakers = [...speakers]
-        new_speakers[editing].name = input
-        new_speakers[editing].color = colorSelected;
-        props.setSpeakers(new_speakers);
-        setEditing("");
+        if (editing === null) return
+        dispatch({
+            type: 'updateSpeaker',
+            payload: {
+                ID: editing,
+                speaker: {
+                    name: input,
+                    color: colorSelected
+                }
+            }})
+
+        setEditing(null);
         setInput("");
         setRemoving(false)
     }
     function removeSpeaker() {
-        const new_speakers = [...speakers]
-        new_speakers.splice(editing, 1)
-        props.setSpeakers(new_speakers)
-        props.clearSpeaker(editing)
+        if (editing === null) return
+        dispatch({
+            type: 'deleteSpeaker',
+            payload: {
+                ID: editing
+            }})
         setRemoving(false)
-        setEditing("");
+        setEditing(null);
     }
-    function keyPressAdd(e) {
+    function keyPressAdd(e: KeyboardEvent<HTMLInputElement>) {
         if (e.key === "Enter") {
             addSpeaker()
         }
     }
     function addSpeaker() {
         if (input !== "") {
-            props.setSpeakers([...speakers, {name: input, color: "Black"}])
+            dispatch({
+                type: 'addSpeaker',
+                payload: {
+                    speaker: {name: input, color: "Black"}
+                }})
             setInput("")
             setAdding(false)
         }
@@ -56,10 +76,10 @@ function SpeakerSettings(props) {
 
                 {editing === idx && (<>
                     <div>
-                        {idx + 1}: <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPress} placeholder={speaker.name} className="SpeakerInput"/>
+                        {idx + 1}: <input value={input} onInput={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} onKeyDown={keyPress} placeholder={speaker.name} className="SpeakerInput"/>
                     </div>
                     <div className="Editing">
-                        <span onClick={() => {setEditing(""); renameSpeaker(); setRemoving(false)}} className='Confirm'>&#10004;</span>
+                        <span onClick={() => {setEditing(null); renameSpeaker(); setRemoving(false)}} className='Confirm'>&#10004;</span>
                         {!removing && <div className='RemoveSpeaker' onClick={() => setRemoving(true)}>&#10006;</div>}
                         {removing && <div className='ReallyRemoveSpeaker' onClick={removeSpeaker}>&#10006;</div>}
                         <select className="ColorSelector" value={colorSelected} onChange={(e) => {setColor(e.target.value)}}>
@@ -79,8 +99,8 @@ function SpeakerSettings(props) {
         )}
         <div className='SpeakersBox'>
             {!adding && <div></div>}
-            {!adding && <span onClick={() => {setAdding(true); setInput(""); setEditing("")}} className="Edit">&#10010;</span>}
-            {adding && <input value={input} onInput={e => setInput(e.target.value)} onKeyDown={keyPressAdd} placeholder={""} className="SpeakerInput"/>}
+            {!adding && <span onClick={() => {setAdding(true); setInput(""); setEditing(null)}} className="Edit">&#10010;</span>}
+            {adding && <input value={input} onInput={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} onKeyDown={keyPressAdd} placeholder={""} className="SpeakerInput"/>}
             {adding && <div className="Editing">
                 <span onClick={() => {addSpeaker()}} className='Confirm'>&#10004;</span>
                 <div className='RemoveSpeaker' onClick={() => setAdding(false)}>&#10006;</div>

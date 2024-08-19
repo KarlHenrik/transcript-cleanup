@@ -4,23 +4,23 @@ import { Document, Packer, Paragraph, TextRun } from "docx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileWord } from '@fortawesome/free-regular-svg-icons';
 import './App.css';
+import { Cell, Speaker } from './types';
 
-function padded_time(time) {
-  if (time.length === 7) {
-    time = "00:" + time
-  }
-  return time
-}
+type DownloadButtonProps = {
+  fileName: string | null;
+  contents: Cell[] | null;
+  speakers: Speaker[];
+};
 
-function DownloadButton(props) {
+function DownloadButton({fileName, contents, speakers}: DownloadButtonProps) {
   
   function handleDownload() {
-    if (!(props.fileName)) {
+    if (!(fileName)) {
       return
     }
-    let pars = [];
-    props.contents.forEach((c) => {
-      let split_text = c.text.split("\n\n").map(
+    const pars: Paragraph[] = [];
+    contents?.forEach((c) => {
+      const split_text = c.text.split("\n\n").map(
         (line, idx) =>
           new TextRun({
             break: idx === 0 ? 0 : 2,
@@ -39,11 +39,12 @@ function DownloadButton(props) {
               size: 24,
             }),
             new TextRun({
-              text: (c.ID !== "" ? props.speakers[c.ID].name : "-") + ": ",
+              text: (c.ID !== null ? speakers[c.ID].name : "-") + ": ",
               bold: true,
               break: 1,
               font: "Calibri",
               size: 24,
+              color: (c.ID !== null ? speakers[c.ID].color.slice(1) : ""),
             }),
             ...split_text,
           ],
@@ -61,11 +62,11 @@ function DownloadButton(props) {
 
     Packer.toBlob(doc).then((blob) => {
       // saveAs from FileSaver will download the file
-      let new_filename = props.fileName.split(".")[0];
+      const new_filename = fileName.split(".")[0];
       saveAs(blob, new_filename + ".docx");
     });
   }
-  if (props.contents) {
+  if (contents) {
     return (
       <div onClick={handleDownload} className="buttonAction">
         <FontAwesomeIcon className="symbol" icon={faFileWord} /> Download as Word
@@ -74,6 +75,13 @@ function DownloadButton(props) {
   } else {
     return null;
   }
+}
+
+function padded_time(time: string) {
+  if (time.length === 7) {
+    time = "00:" + time
+  }
+  return time
 }
 
 export default DownloadButton;

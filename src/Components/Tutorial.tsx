@@ -1,11 +1,15 @@
 import React from 'react';
 
-function Tutorial({ speakerSwap, isExpanded }) {
-  
+type TutorialProps = {
+  isExpanded: boolean;
+};
+
+function Tutorial({ isExpanded }: TutorialProps) {
+  // Component logic here
 
   return (
-    <div className='Tutorial'>
-      <ul style={{ visibility: isExpanded && "hidden" }}>
+    <div   className='Tutorial'>
+         <ul style={{ visibility: isExpanded ? "hidden" : undefined}}>
         <li>Click to the left of a text cell to select a speaker cell</li>
         <li>Move between speaker cells with ArrowUp/ArrowDown or W/S</li>
         <li>Assign speakers with number keys</li>
@@ -20,7 +24,7 @@ function Tutorial({ speakerSwap, isExpanded }) {
         <li>Add cell below with B</li>
         <li>Cut cell with X</li>
         <li>Paste cell with V</li>
-        <li>Swap two speakers by clicking <span onClick={speakerSwap}>here</span></li>
+        <li>Swap two speakers by clicking <span>here</span></li>
       </ul>
     </div>
   );
