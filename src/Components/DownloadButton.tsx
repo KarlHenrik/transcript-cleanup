@@ -44,6 +44,7 @@ function DownloadButton({fileName, contents, speakers}: DownloadButtonProps) {
               break: 1,
               font: "Calibri",
               size: 24,
+              color: (c.ID !== null ? speakers[c.ID].color.slice(1) : ""),
             }),
             ...split_text,
           ],
