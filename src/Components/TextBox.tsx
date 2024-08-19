@@ -202,7 +202,15 @@ function TextBox({cell, idx, dispatch, speakers, newfocus}: TextBoxProps) {
     return <div className="TextBox">
         <div className="Time">{cell.time}</div>
         <div className="Speaker" ref={cellRef} tabIndex={0} onFocus={handleOnFocus} style={{ color: cell.speaker?.color || "black"}} onKeyDown={(e) => {speakerKeyDown(e);}}>{cell.time && <br />}<b>{cell.speaker && cell.speaker.name}{cell.ID !== null && ": "}{cell.ID === null && "-"}</b></div>
-        <div className="Quote" tabIndex={0} onKeyDown={(e) => {quoteKeyDown(e)}} onInput={e => setInput(e.currentTarget.textContent || "")} contentEditable={true} suppressContentEditableWarning={true}>{cell.text}</div>
+        <div className="Quote" tabIndex={0} onKeyDown={(e) => {quoteKeyDown(e)}} onInput={e => {
+            setInput(e.currentTarget.textContent || "")
+            dispatch({
+                type: 'updateCellText',
+                payload: {
+                    text: e.currentTarget.textContent,
+                    idx: idx
+                }})
+            }} contentEditable={true} suppressContentEditableWarning={true}>{cell.text}</div>
     </div>
 }
 

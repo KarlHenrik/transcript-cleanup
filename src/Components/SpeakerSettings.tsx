@@ -76,7 +76,7 @@ function SpeakerSettings({speakers, dispatch}: SpeakerSettignsProps) {
 
                 {editing === idx && (<>
                     <div>
-                        {idx + 1}: <input value={input} onInput={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} onKeyDown={keyPress} placeholder={speaker.name} className="SpeakerInput"/>
+                        {idx + 1}: <input className="SpeakerInput" value={input} onInput={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} onKeyDown={keyPress} placeholder={speaker.name} />
                     </div>
                     <div className="Editing">
                         <span onClick={() => {setEditing(null); renameSpeaker(); setRemoving(false)}} className='Confirm'>&#10004;</span>
