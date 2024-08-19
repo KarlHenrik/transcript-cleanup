@@ -6,7 +6,7 @@ import TextDisplay from './TextDisplay';
 import Tutorial from './Tutorial';
 import AudioPlayer from './AudioPlayer';
 import { useLocalStorage } from "./useLocalStorage";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faUsersBetweenLines, faArrowRight, faUsersSlash } from '@fortawesome/free-solid-svg-icons';
 import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
