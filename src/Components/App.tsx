@@ -1,5 +1,6 @@
 import './App.css';
-import DownloadButton from './DownloadButton';
+import DownloadWordButton from './DownloadWordButton';
+import DownloadVTTButton from './DownloadVTTButton';
 import FileSelector from './FileSelector';
 import SpeakerSettings from './SpeakerSettings';
 import TextDisplay from './TextDisplay';
@@ -59,7 +60,8 @@ function App() {
           <div className='buttonAction' onClick={() => dispatch({type: 'collapseSpeakers'})}>
             <FontAwesomeIcon className="symbol" icon={faUsersSlash} /> Collapse Speakers
           </div>
-          <DownloadButton contents={contents} speakers={speakers} fileName={fileName} />
+          <DownloadWordButton contents={contents} speakers={speakers} fileName={fileName} />
+          <DownloadVTTButton contents={contents} fileName={fileName} />
           <div className='buttonAction' onClick={() => setIsExpanded(!isExpanded)}>
           <FontAwesomeIcon className="symbol" icon={faCircleQuestion} /> Help
           </div>
