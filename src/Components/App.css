@@ -33,7 +33,7 @@
 .section {
   text-align: left;
   width: 90%; /* Make .section elements full width of .Controls */
-  padding-bottom: 70px;
+  padding-bottom: 40px;
   /* Add top and bottom margin if needed */
 }
 

@@ -85,10 +85,9 @@ function parseSpeaker(line: string) {
         const message = match[2];
         return { speakerID, message };
     } else {
-        // If the pattern is not matched, return some indication such as null or an error
         const speakerID = null;
         const message = line;
-        return { speakerID, message }; // or throw an Error, or return an object with an error property
+        return { speakerID, message };
     }
 }
 

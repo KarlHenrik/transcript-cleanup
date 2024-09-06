@@ -6,13 +6,13 @@ import { faFileWord } from '@fortawesome/free-regular-svg-icons';
 import './App.css';
 import { Cell, Speaker } from './types';
 
-type DownloadButtonProps = {
+type DownloadWordButtonProps = {
   fileName: string | null;
   contents: Cell[] | null;
   speakers: Speaker[];
 };
 
-function DownloadButton({fileName, contents, speakers}: DownloadButtonProps) {
+function DownloadWordButton({fileName, contents, speakers}: DownloadWordButtonProps) {
   
   function handleDownload() {
     if (!(fileName)) {
@@ -84,4 +84,4 @@ function padded_time(time: string) {
   return time
 }
 
-export default DownloadButton;
+export default DownloadWordButton;
