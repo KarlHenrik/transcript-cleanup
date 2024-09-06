@@ -15,16 +15,16 @@ type DownloadVTTButtonProps = {
 function DownloadVTTButton({fileName, contents}: DownloadVTTButtonProps) {
   
   function handleDownload() {
-    if (!(fileName)) {
+    if (!(fileName) || !(contents)) {
       return
     }
 
-    let latestTime = "00:00:00.000"
+    let latestTime = (contents[0].time.length === 7) ? "00:00.000" : "00:00:00.000"
 
     let finalText = "WEBVTT\n\n";
     contents?.forEach((c) => {
       if (c.time !== "") {
-        latestTime = padded_time(c.time) + "00"
+        latestTime = c.time + "00"
       }
       finalText += latestTime + " --> " + latestTime + "\n"
       finalText += c.ID !== null ? "[SPEAKER_0" + c.ID + "]: ": ""
@@ -46,13 +46,6 @@ function DownloadVTTButton({fileName, contents}: DownloadVTTButtonProps) {
   } else {
     return null;
   }
-}
-
-function padded_time(time: string) {
-  if (time.length === 7) {
-    time = "00:" + time
-  }
-  return time
 }
 
 export default DownloadVTTButton;
